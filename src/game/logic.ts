@@ -15,6 +15,13 @@ const getUtcDayNumber = (date: Date) => {
   return Math.floor(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) / 86400000);
 };
 
+export const getDateKey = (date = new Date()) => {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export const getDailyWord = (date = new Date()) => {
   const reference = new Date(`${REFERENCE_DATE_UTC}T00:00:00Z`);
   const dayIndex = getUtcDayNumber(date) - getUtcDayNumber(reference);
