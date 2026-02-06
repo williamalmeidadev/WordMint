@@ -3,6 +3,7 @@ import type { GameStatus } from '../game/types';
 
 const STATS_KEY = 'wordmint-stats';
 const DAILY_KEY = 'wordmint-daily';
+const SETTINGS_KEY = 'wordmint-settings';
 
 export type GameStats = {
   gamesPlayed: number;
@@ -19,6 +20,14 @@ export type StoredDailyState = {
   guesses: string[];
   status: GameStatus;
 };
+
+export type GameSettings = {
+  colorBlindMode: boolean;
+};
+
+export const createDefaultSettings = (): GameSettings => ({
+  colorBlindMode: false
+});
 
 export const createEmptyStats = (): GameStats => ({
   gamesPlayed: 0,
@@ -63,4 +72,20 @@ export const saveDailyState = (state: StoredDailyState) => {
 
 export const clearDailyState = () => {
   localStorage.removeItem(DAILY_KEY);
+};
+
+export const loadSettings = (): GameSettings => {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (!raw) return createDefaultSettings();
+    const parsed = JSON.parse(raw) as GameSettings;
+    if (typeof parsed.colorBlindMode !== 'boolean') return createDefaultSettings();
+    return parsed;
+  } catch {
+    return createDefaultSettings();
+  }
+};
+
+export const saveSettings = (settings: GameSettings) => {
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 };
