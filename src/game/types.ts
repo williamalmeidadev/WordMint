@@ -5,6 +5,4 @@ export type GuessEvaluation = {
   states: LetterState[];
 };
 
-export type GameMode = 'daily' | 'practice';
-
 export type GameStatus = 'playing' | 'won' | 'lost';

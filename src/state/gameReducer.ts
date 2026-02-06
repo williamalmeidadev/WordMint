@@ -1,8 +1,7 @@
 import { MAX_ATTEMPTS, WORD_LENGTH } from '../game/constants';
-import type { GameMode, GameStatus, GuessEvaluation } from '../game/types';
+import type { GameStatus, GuessEvaluation } from '../game/types';
 
 export type GameState = {
-  mode: GameMode;
   solution: string;
   guesses: string[];
   evaluations: GuessEvaluation[];
@@ -19,15 +18,12 @@ export type GameAction =
   | { type: 'SUBMIT_GUESS'; guess: string; evaluation: GuessEvaluation; status: GameStatus; message?: string }
   | { type: 'SET_MESSAGE'; message: string | null }
   | { type: 'RESET_GAME'; solution: string }
-  | { type: 'SET_MODE'; mode: GameMode; solution: string }
   | { type: 'TOGGLE_COLOR_BLIND' };
 
 export const createInitialState = (
-  mode: GameMode,
   solution: string,
   colorBlindMode = false
 ): GameState => ({
-  mode,
   solution,
   guesses: [],
   evaluations: [],
@@ -77,18 +73,6 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
     case 'RESET_GAME':
       return {
         ...state,
-        solution: action.solution,
-        guesses: [],
-        evaluations: [],
-        currentGuess: '',
-        status: 'playing',
-        attemptIndex: 0,
-        message: null
-      };
-    case 'SET_MODE':
-      return {
-        ...state,
-        mode: action.mode,
         solution: action.solution,
         guesses: [],
         evaluations: [],

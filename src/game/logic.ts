@@ -1,4 +1,4 @@
-import { MAX_ATTEMPTS, REFERENCE_DATE_UTC, WORD_LENGTH } from './constants';
+import { MAX_ATTEMPTS, WORD_LENGTH } from './constants';
 import type { GuessEvaluation, LetterState } from './types';
 import { WORDS } from '../data/words';
 
@@ -10,24 +10,6 @@ export const isValidWord = (value: string) => {
 };
 
 export const getRandomWord = () => WORDS[Math.floor(Math.random() * WORDS.length)];
-
-const getUtcDayNumber = (date: Date) => {
-  return Math.floor(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) / 86400000);
-};
-
-export const getDateKey = (date = new Date()) => {
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(date.getUTCDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
-export const getDailyWord = (date = new Date()) => {
-  const reference = new Date(`${REFERENCE_DATE_UTC}T00:00:00Z`);
-  const dayIndex = getUtcDayNumber(date) - getUtcDayNumber(reference);
-  const safeIndex = ((dayIndex % WORDS.length) + WORDS.length) % WORDS.length;
-  return WORDS[safeIndex];
-};
 
 export const evaluateGuess = (guess: string, solution: string): GuessEvaluation => {
   const cleanGuess = normalizeWord(guess).padEnd(WORD_LENGTH, ' ');
