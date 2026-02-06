@@ -1,15 +1,18 @@
-import { useCallback, useEffect, useMemo, useReducer } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import Header from './components/Header';
 import GameBoard from './components/GameBoard';
 import Keyboard from './components/Keyboard';
 import MessageBanner from './components/MessageBanner';
+import StatsPanel from './components/StatsPanel';
 import {
   MAX_ATTEMPTS,
   WORD_LENGTH,
   buildEmptyEvaluation,
   buildKeyboardState,
+  buildShareText,
   evaluateGuess,
   getDailyWord,
+  getDateKey,
   getRandomWord,
   isValidWord,
   isWinningGuess,
@@ -17,19 +20,40 @@ import {
 } from './game';
 import { createInitialState, gameReducer } from './state/gameReducer';
 import type { GuessEvaluation, GameMode } from './game/types';
+import { clearDailyState, loadDailyState, loadStats, saveDailyState, saveStats } from './storage/storage';
 
 const buildActiveRow = (currentGuess: string): GuessEvaluation => ({
   letters: currentGuess.padEnd(WORD_LENGTH, ' ').split('').map((letter) => letter.trim()),
   states: Array(WORD_LENGTH).fill('empty')
 });
 
-export default function App() {
-  const [state, dispatch] = useReducer(
-    gameReducer,
-    createInitialState('daily', getDailyWord())
-  );
+const hydrateDailyState = () => {
+  const dateKey = getDateKey();
+  const solution = getDailyWord();
+  const stored = loadDailyState();
 
-  const { evaluations, currentGuess, attemptIndex, message, status, mode, colorBlindMode } = state;
+  if (!stored || stored.dateKey !== dateKey || stored.solution !== solution) {
+    clearDailyState();
+    return createInitialState('daily', solution);
+  }
+
+  const evaluations = stored.guesses.map((guess) => evaluateGuess(guess, stored.solution));
+
+  return {
+    ...createInitialState('daily', stored.solution),
+    guesses: stored.guesses,
+    evaluations,
+    attemptIndex: stored.guesses.length,
+    status: stored.status
+  };
+};
+
+export default function App() {
+  const [state, dispatch] = useReducer(gameReducer, undefined, hydrateDailyState);
+  const [stats, setStats] = useState(loadStats);
+
+  const { evaluations, currentGuess, attemptIndex, message, status, mode, colorBlindMode, solution, guesses } = state;
+  const dateKey = useMemo(() => getDateKey(), []);
 
   const rows = useMemo(() => {
     const filledRows = evaluations.map((evaluation) => evaluation);
@@ -46,6 +70,47 @@ export default function App() {
     document.documentElement.setAttribute('data-color-blind', String(colorBlindMode));
   }, [colorBlindMode]);
 
+  useEffect(() => {
+    if (mode !== 'daily') return;
+    saveDailyState({
+      dateKey,
+      solution,
+      guesses,
+      status
+    });
+  }, [dateKey, guesses, mode, solution, status]);
+
+  useEffect(() => {
+    saveStats(stats);
+  }, [stats]);
+
+  useEffect(() => {
+    if (status === 'playing') return;
+
+    if (mode === 'daily' && stats.lastResultDateKey === dateKey) return;
+
+    const nextStats = { ...stats };
+    nextStats.gamesPlayed += 1;
+    if (status === 'won') {
+      nextStats.gamesWon += 1;
+      if (evaluations.length > 0) {
+        nextStats.guessDistribution[evaluations.length - 1] += 1;
+      }
+      if (mode === 'daily') {
+        nextStats.currentStreak += 1;
+        nextStats.maxStreak = Math.max(nextStats.maxStreak, nextStats.currentStreak);
+      }
+    } else if (mode === 'daily') {
+      nextStats.currentStreak = 0;
+    }
+
+    if (mode === 'daily') {
+      nextStats.lastResultDateKey = dateKey;
+    }
+
+    setStats(nextStats);
+  }, [dateKey, evaluations.length, mode, stats, status]);
+
   const setMessage = useCallback((nextMessage: string | null) => {
     dispatch({ type: 'SET_MESSAGE', message: nextMessage });
   }, []);
@@ -61,13 +126,13 @@ export default function App() {
       return;
     }
 
-    const evaluation = evaluateGuess(currentGuess, state.solution);
-    const isWin = isWinningGuess(currentGuess, state.solution);
+    const evaluation = evaluateGuess(currentGuess, solution);
+    const isWin = isWinningGuess(currentGuess, solution);
     const nextStatus = isWin ? 'won' : attemptIndex + 1 >= MAX_ATTEMPTS ? 'lost' : 'playing';
     const nextMessage = isWin
       ? `Solved in ${attemptIndex + 1} ${attemptIndex + 1 === 1 ? 'try' : 'tries'}`
       : nextStatus === 'lost'
-        ? `The word was ${state.solution}`
+        ? `The word was ${solution}`
         : null;
 
     dispatch({
@@ -77,7 +142,7 @@ export default function App() {
       status: nextStatus,
       message: nextMessage ?? undefined
     });
-  }, [attemptIndex, currentGuess, setMessage, state.solution, status]);
+  }, [attemptIndex, currentGuess, setMessage, solution, status]);
 
   const handleLetter = useCallback(
     (letter: string) => {
@@ -105,6 +170,25 @@ export default function App() {
     if (mode !== 'practice') return;
     dispatch({ type: 'RESET_GAME', solution: getRandomWord() });
   }, [mode]);
+
+  const shareText = useMemo(() => {
+    if (status === 'playing') return '';
+    return buildShareText({
+      mode,
+      dateKey,
+      status,
+      evaluations
+    });
+  }, [dateKey, evaluations, mode, status]);
+
+  const handleShare = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(shareText);
+      setMessage('Copied to clipboard');
+    } catch {
+      setMessage('Clipboard unavailable');
+    }
+  }, [setMessage, shareText]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -168,6 +252,15 @@ export default function App() {
           onLetter={handleLetter}
           onEnter={submitGuess}
           onBackspace={handleBackspace}
+        />
+
+        <StatsPanel
+          stats={stats}
+          mode={mode}
+          status={status}
+          attempts={status === 'won' ? evaluations.length : 0}
+          onShare={handleShare}
+          shareAvailable={status !== 'playing'}
         />
       </div>
     </main>
