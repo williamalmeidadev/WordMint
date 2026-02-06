@@ -5,12 +5,12 @@ type HeaderProps = {
 
 export default function Header({ colorBlindMode, onToggleColorBlind }: HeaderProps) {
   return (
-    <header className="flex flex-col gap-6 rounded-3xl border border-fog/10 bg-slate/70 px-6 py-6">
-      <div className="flex flex-wrap items-center justify-between gap-6">
+    <header className="flex flex-col gap-5 rounded-2xl border border-fog/10 bg-slate/70 px-4 py-5 sm:gap-6 sm:rounded-3xl sm:px-6 sm:py-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.45em] text-mint">WordMint</p>
-          <h1 className="text-3xl font-semibold text-fog">Random word challenge, crafted offline.</h1>
-          <p className="max-w-xl text-sm text-fog/70">
+          <h1 className="text-2xl font-semibold text-fog sm:text-3xl">Random word challenge, crafted offline.</h1>
+          <p className="max-w-xl text-sm text-fog/70 sm:text-base">
             Guess the five-letter word in six tries. Play as many random rounds as you like.
           </p>
         </div>

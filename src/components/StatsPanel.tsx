@@ -14,24 +14,24 @@ export default function StatsPanel({ stats, status, onShare, shareAvailable }: S
   const winRate = stats.gamesPlayed ? stats.gamesWon / stats.gamesPlayed : 0;
 
   return (
-    <section className="grid gap-4 rounded-3xl border border-fog/10 bg-slate/60 px-6 py-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+    <section className="grid gap-4 rounded-2xl border border-fog/10 bg-slate/60 px-4 py-5 sm:rounded-3xl sm:px-6 sm:py-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div>
           <p className="text-xs uppercase tracking-[0.35em] text-fog/50">Statistics</p>
-          <p className="text-lg font-semibold">Progress snapshot</p>
+          <p className="text-base font-semibold sm:text-lg">Progress snapshot</p>
         </div>
         {shareAvailable ? (
           <button
             type="button"
             onClick={onShare}
-            className="rounded-full bg-mint px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-ink"
+            className="w-full rounded-full bg-mint px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-ink sm:w-auto"
           >
             Share result
           </button>
         ) : null}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-fog/10 bg-ink/60 px-4 py-4">
           <p className="text-xs uppercase tracking-[0.3em] text-fog/60">Games</p>
           <p className="text-2xl font-semibold">{stats.gamesPlayed}</p>

@@ -24,7 +24,7 @@ export default function Keyboard({ letterStates, onLetter, onEnter, onBackspace 
   return (
     <section aria-label="On screen keyboard" className="flex flex-col gap-2">
       {rows.map((row, rowIndex) => (
-        <div key={`key-row-${rowIndex}`} className="flex flex-wrap justify-center gap-2">
+        <div key={`key-row-${rowIndex}`} className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
           {row.map((key) => {
             if (key === 'ENTER') {
               return (
