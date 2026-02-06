@@ -22,7 +22,11 @@ export type GameAction =
   | { type: 'SET_MODE'; mode: GameMode; solution: string }
   | { type: 'TOGGLE_COLOR_BLIND' };
 
-export const createInitialState = (mode: GameMode, solution: string): GameState => ({
+export const createInitialState = (
+  mode: GameMode,
+  solution: string,
+  colorBlindMode = false
+): GameState => ({
   mode,
   solution,
   guesses: [],
@@ -31,7 +35,7 @@ export const createInitialState = (mode: GameMode, solution: string): GameState 
   status: 'playing',
   attemptIndex: 0,
   message: null,
-  colorBlindMode: false
+  colorBlindMode
 });
 
 export const gameReducer = (state: GameState, action: GameAction): GameState => {

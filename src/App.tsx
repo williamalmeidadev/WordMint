@@ -20,7 +20,15 @@ import {
 } from './game';
 import { createInitialState, gameReducer } from './state/gameReducer';
 import type { GuessEvaluation, GameMode } from './game/types';
-import { clearDailyState, loadDailyState, loadStats, saveDailyState, saveStats } from './storage/storage';
+import {
+  clearDailyState,
+  loadDailyState,
+  loadSettings,
+  loadStats,
+  saveDailyState,
+  saveSettings,
+  saveStats
+} from './storage/storage';
 
 const buildActiveRow = (currentGuess: string): GuessEvaluation => ({
   letters: currentGuess.padEnd(WORD_LENGTH, ' ').split('').map((letter) => letter.trim()),
@@ -31,16 +39,17 @@ const hydrateDailyState = () => {
   const dateKey = getDateKey();
   const solution = getDailyWord();
   const stored = loadDailyState();
+  const settings = loadSettings();
 
   if (!stored || stored.dateKey !== dateKey || stored.solution !== solution) {
     clearDailyState();
-    return createInitialState('daily', solution);
+    return createInitialState('daily', solution, settings.colorBlindMode);
   }
 
   const evaluations = stored.guesses.map((guess) => evaluateGuess(guess, stored.solution));
 
   return {
-    ...createInitialState('daily', stored.solution),
+    ...createInitialState('daily', stored.solution, settings.colorBlindMode),
     guesses: stored.guesses,
     evaluations,
     attemptIndex: stored.guesses.length,
@@ -69,6 +78,10 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-color-blind', String(colorBlindMode));
+  }, [colorBlindMode]);
+
+  useEffect(() => {
+    saveSettings({ colorBlindMode });
   }, [colorBlindMode]);
 
   useEffect(() => {
