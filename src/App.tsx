@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import Header from './components/Header';
 import GameBoard from './components/GameBoard';
 import Keyboard from './components/Keyboard';
@@ -51,6 +51,7 @@ const hydrateDailyState = () => {
 export default function App() {
   const [state, dispatch] = useReducer(gameReducer, undefined, hydrateDailyState);
   const [stats, setStats] = useState(loadStats);
+  const recordedResultRef = useRef<string | null>(null);
 
   const { evaluations, currentGuess, attemptIndex, message, status, mode, colorBlindMode, solution, guesses } = state;
   const dateKey = useMemo(() => getDateKey(), []);
@@ -71,6 +72,12 @@ export default function App() {
   }, [colorBlindMode]);
 
   useEffect(() => {
+    if (status === 'playing') {
+      recordedResultRef.current = null;
+    }
+  }, [status]);
+
+  useEffect(() => {
     if (mode !== 'daily') return;
     saveDailyState({
       dateKey,
@@ -87,6 +94,8 @@ export default function App() {
   useEffect(() => {
     if (status === 'playing') return;
 
+    const resultKey = `${mode}-${dateKey}-${solution}-${guesses.length}`;
+    if (recordedResultRef.current === resultKey) return;
     if (mode === 'daily' && stats.lastResultDateKey === dateKey) return;
 
     const nextStats = { ...stats };
@@ -108,8 +117,9 @@ export default function App() {
       nextStats.lastResultDateKey = dateKey;
     }
 
+    recordedResultRef.current = resultKey;
     setStats(nextStats);
-  }, [dateKey, evaluations.length, mode, stats, status]);
+  }, [dateKey, evaluations.length, guesses.length, mode, solution, stats, status]);
 
   const setMessage = useCallback((nextMessage: string | null) => {
     dispatch({ type: 'SET_MESSAGE', message: nextMessage });
