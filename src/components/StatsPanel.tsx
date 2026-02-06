@@ -1,18 +1,16 @@
-import type { GameMode, GameStatus } from '../game/types';
+import type { GameStatus } from '../game/types';
 import type { GameStats } from '../storage/storage';
 
 const formatPercentage = (value: number) => `${Math.round(value * 100)}%`;
 
 type StatsPanelProps = {
   stats: GameStats;
-  mode: GameMode;
   status: GameStatus;
-  attempts: number;
   onShare: () => void;
   shareAvailable: boolean;
 };
 
-export default function StatsPanel({ stats, mode, status, attempts, onShare, shareAvailable }: StatsPanelProps) {
+export default function StatsPanel({ stats, status, onShare, shareAvailable }: StatsPanelProps) {
   const winRate = stats.gamesPlayed ? stats.gamesWon / stats.gamesPlayed : 0;
 
   return (
@@ -69,11 +67,9 @@ export default function StatsPanel({ stats, mode, status, attempts, onShare, sha
           ))}
         </div>
         <p className="text-xs text-fog/60">
-          {mode === 'daily'
-            ? status === 'playing'
-              ? 'Finish the daily puzzle to update stats.'
-              : `Daily result recorded in ${attempts || 'X'} attempts.`
-            : 'Practice rounds are included in your overall stats.'}
+          {status === 'playing'
+            ? 'Finish the round to update stats.'
+            : 'Result recorded in your stats.'}
         </p>
       </div>
     </section>

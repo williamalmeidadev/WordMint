@@ -1,10 +1,9 @@
 # WordMint
 
-WordMint is a browser-based word guessing game inspired by classic five-letter puzzles. It runs entirely on the client side with deterministic daily logic, offline practice mode, and persistent stats.
+WordMint is a browser-based word guessing game inspired by classic five-letter puzzles. It runs entirely on the client side with random word selection, offline play, and persistent stats.
 
 ## Highlights
-- Daily mode with a deterministic word (same for everyone each day)
-- Practice mode for unlimited offline play
+- Random word mode for unlimited offline play
 - Accessible UI with keyboard support and color-blind palette toggle
 - Local storage persistence for progress, stats, and settings
 - Shareable emoji grid results without revealing the word
@@ -31,12 +30,11 @@ npm run dev
 - `npm run format` - check formatting
 - `npm run test` - run tests
 
-## Daily Word Logic
-The daily word is calculated using a fixed UTC reference date. The app computes the number of days since that reference and uses modulo against the word list length to pick a deterministic word. This keeps the daily puzzle consistent for all users, fully offline.
+## Word Selection
+Each round uses a random word from the curated list, fully offline.
 
 ## Persistence
 Stored under these `localStorage` keys:
-- `wordmint-daily` - daily game state
 - `wordmint-stats` - win rate, streaks, distribution
 - `wordmint-settings` - user preferences (color-blind mode)
 
