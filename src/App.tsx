@@ -180,17 +180,17 @@ export default function App() {
 
   return (
     <main className="min-h-screen bg-ink text-fog">
-      <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-10 px-6 py-10">
+      <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-8 px-4 py-8 sm:gap-10 sm:px-6 sm:py-10">
         <Header
           colorBlindMode={colorBlindMode}
           onToggleColorBlind={() => dispatch({ type: 'TOGGLE_COLOR_BLIND' })}
         />
 
-        <section className="grid gap-6 rounded-3xl border border-fog/10 bg-slate/60 px-6 py-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
+        <section className="grid gap-6 rounded-2xl border border-fog/10 bg-slate/60 px-4 py-5 sm:rounded-3xl sm:px-6 sm:py-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.35em] text-fog/50">random mode</p>
-              <p className="text-lg font-semibold">
+              <p className="text-base font-semibold sm:text-lg">
                 {status === 'playing' && 'Make your next guess'}
                 {status === 'won' && 'Great work!'}
                 {status === 'lost' && 'Better luck next round'}
@@ -199,7 +199,7 @@ export default function App() {
             <button
               type="button"
               onClick={resetGame}
-              className="rounded-full border border-fog/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-fog/70 transition hover:border-mint hover:text-mint"
+              className="w-full rounded-full border border-fog/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-fog/70 transition hover:border-mint hover:text-mint sm:w-auto"
             >
               New word
             </button>
