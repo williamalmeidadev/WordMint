@@ -2,11 +2,13 @@ import { MAX_ATTEMPTS, WORD_LENGTH } from './constants';
 import type { GuessEvaluation, LetterState } from './types';
 import { WORDS } from '../data/words';
 
+const WORD_SET = new Set(WORDS);
+
 export const normalizeWord = (value: string) => value.toUpperCase().replace(/[^A-Z]/g, '');
 
 export const isValidWord = (value: string) => {
   const normalized = normalizeWord(value);
-  return normalized.length === WORD_LENGTH && WORDS.includes(normalized);
+  return normalized.length === WORD_LENGTH && WORD_SET.has(normalized);
 };
 
 export const getRandomWord = () => WORDS[Math.floor(Math.random() * WORDS.length)];

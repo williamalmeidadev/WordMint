@@ -71,23 +71,24 @@ export default function App() {
 
     const resultKey = `${solution}-${guesses.length}`;
     if (recordedResultRef.current === resultKey) return;
-
-    const nextStats = { ...stats };
-    nextStats.gamesPlayed += 1;
-    if (status === 'won') {
-      nextStats.gamesWon += 1;
-      if (evaluations.length > 0) {
-        nextStats.guessDistribution[evaluations.length - 1] += 1;
-      }
-      nextStats.currentStreak += 1;
-      nextStats.maxStreak = Math.max(nextStats.maxStreak, nextStats.currentStreak);
-    } else {
-      nextStats.currentStreak = 0;
-    }
-
     recordedResultRef.current = resultKey;
-    setStats(nextStats);
-  }, [evaluations.length, guesses.length, solution, stats, status]);
+
+    setStats((prev) => {
+      const nextStats = { ...prev };
+      nextStats.gamesPlayed += 1;
+      if (status === 'won') {
+        nextStats.gamesWon += 1;
+        if (evaluations.length > 0) {
+          nextStats.guessDistribution[evaluations.length - 1] += 1;
+        }
+        nextStats.currentStreak += 1;
+        nextStats.maxStreak = Math.max(nextStats.maxStreak, nextStats.currentStreak);
+      } else {
+        nextStats.currentStreak = 0;
+      }
+      return nextStats;
+    });
+  }, [evaluations.length, guesses.length, solution, status]);
 
   const setMessage = useCallback((nextMessage: string | null) => {
     dispatch({ type: 'SET_MESSAGE', message: nextMessage });
@@ -179,14 +180,14 @@ export default function App() {
   }, [handleBackspace, handleLetter, submitGuess]);
 
   return (
-    <main className="min-h-screen bg-ink text-fog">
+    <main className="app-shell min-h-screen text-fog">
       <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-8 px-4 py-8 sm:gap-10 sm:px-6 sm:py-10">
         <Header
           colorBlindMode={colorBlindMode}
           onToggleColorBlind={() => dispatch({ type: 'TOGGLE_COLOR_BLIND' })}
         />
 
-        <section className="grid gap-6 rounded-2xl border border-fog/10 bg-slate/60 px-4 py-5 sm:rounded-3xl sm:px-6 sm:py-6">
+        <section className="panel grid gap-6 rounded-2xl border border-fog/10 bg-slate/60 px-4 py-5 sm:rounded-3xl sm:px-6 sm:py-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.35em] text-fog/50">random mode</p>
@@ -199,7 +200,7 @@ export default function App() {
             <button
               type="button"
               onClick={resetGame}
-              className="w-full rounded-full border border-fog/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-fog/70 transition hover:border-mint hover:text-mint sm:w-auto"
+              className="control-pill w-full rounded-full border border-fog/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-fog/70 transition hover:border-mint hover:text-mint sm:w-auto"
             >
               New word
             </button>

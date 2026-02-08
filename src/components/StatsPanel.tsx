@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { GameStatus } from '../game/types';
 import type { GameStats } from '../storage/storage';
 
@@ -10,11 +11,11 @@ type StatsPanelProps = {
   shareAvailable: boolean;
 };
 
-export default function StatsPanel({ stats, status, onShare, shareAvailable }: StatsPanelProps) {
+function StatsPanel({ stats, status, onShare, shareAvailable }: StatsPanelProps) {
   const winRate = stats.gamesPlayed ? stats.gamesWon / stats.gamesPlayed : 0;
 
   return (
-    <section className="grid gap-4 rounded-2xl border border-fog/10 bg-slate/60 px-4 py-5 sm:rounded-3xl sm:px-6 sm:py-6">
+    <section className="panel grid gap-4 rounded-2xl border border-fog/10 bg-slate/60 px-4 py-5 sm:rounded-3xl sm:px-6 sm:py-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div>
           <p className="text-xs uppercase tracking-[0.35em] text-fog/50">Statistics</p>
@@ -24,7 +25,7 @@ export default function StatsPanel({ stats, status, onShare, shareAvailable }: S
           <button
             type="button"
             onClick={onShare}
-            className="w-full rounded-full bg-mint px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-ink sm:w-auto"
+            className="control-pill w-full rounded-full bg-mint px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-ink sm:w-auto"
           >
             Share result
           </button>
@@ -75,3 +76,5 @@ export default function StatsPanel({ stats, status, onShare, shareAvailable }: S
     </section>
   );
 }
+
+export default memo(StatsPanel);

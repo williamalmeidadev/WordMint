@@ -1,11 +1,13 @@
+import { memo } from 'react';
+
 type HeaderProps = {
   colorBlindMode: boolean;
   onToggleColorBlind: () => void;
 };
 
-export default function Header({ colorBlindMode, onToggleColorBlind }: HeaderProps) {
+function Header({ colorBlindMode, onToggleColorBlind }: HeaderProps) {
   return (
-    <header className="flex flex-col gap-5 rounded-2xl border border-fog/10 bg-slate/70 px-4 py-5 sm:gap-6 sm:rounded-3xl sm:px-6 sm:py-6">
+    <header className="panel flex flex-col gap-5 rounded-2xl border border-fog/10 bg-slate/70 px-4 py-5 sm:gap-6 sm:rounded-3xl sm:px-6 sm:py-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.45em] text-mint">WordMint</p>
@@ -20,7 +22,7 @@ export default function Header({ colorBlindMode, onToggleColorBlind }: HeaderPro
         <button
           type="button"
           onClick={onToggleColorBlind}
-          className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] transition ${
+          className={`control-pill rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] transition ${
             colorBlindMode ? 'bg-lemon text-ink' : 'bg-ink/60 text-fog'
           }`}
           aria-pressed={colorBlindMode}
@@ -31,3 +33,5 @@ export default function Header({ colorBlindMode, onToggleColorBlind }: HeaderPro
     </header>
   );
 }
+
+export default memo(Header);

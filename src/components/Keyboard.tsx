@@ -1,3 +1,5 @@
+import { memo } from 'react';
+import type { MouseEvent } from 'react';
 import type { LetterState } from '../game/types';
 
 const rows = [
@@ -20,7 +22,12 @@ type KeyboardProps = {
   onBackspace: () => void;
 };
 
-export default function Keyboard({ letterStates, onLetter, onEnter, onBackspace }: KeyboardProps) {
+function Keyboard({ letterStates, onLetter, onEnter, onBackspace }: KeyboardProps) {
+  const handleLetterClick = (event: MouseEvent<HTMLButtonElement>) => {
+    const key = event.currentTarget.dataset.key;
+    if (key) onLetter(key);
+  };
+
   return (
     <section aria-label="On screen keyboard" className="flex flex-col gap-2">
       {rows.map((row, rowIndex) => (
@@ -56,7 +63,8 @@ export default function Keyboard({ letterStates, onLetter, onEnter, onBackspace 
               <button
                 key={key}
                 type="button"
-                onClick={() => onLetter(key)}
+                data-key={key}
+                onClick={handleLetterClick}
                 className={keyStyles[letterStates[key] ?? 'empty']}
               >
                 {key}
@@ -68,3 +76,5 @@ export default function Keyboard({ letterStates, onLetter, onEnter, onBackspace 
     </section>
   );
 }
+
+export default memo(Keyboard);

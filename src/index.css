@@ -15,6 +15,8 @@
   --color-absent: #1f2937;
   --color-key: #111827;
   --color-key-border: rgba(229, 231, 235, 0.2);
+  --glow-mint: rgba(45, 212, 191, 0.22);
+  --glow-lemon: rgba(250, 204, 21, 0.18);
 }
 
 :root[data-color-blind='true'] {
@@ -24,6 +26,30 @@
 
 body {
   margin: 0;
+  min-height: 100%;
+  background: #0b0e14;
+}
+
+.app-shell {
+  position: relative;
+  isolation: isolate;
+  background: radial-gradient(1200px 600px at 8% -10%, var(--glow-mint), transparent 60%),
+    radial-gradient(900px 600px at 92% 0%, var(--glow-lemon), transparent 55%),
+    linear-gradient(180deg, #0b0e14 0%, #0c121f 100%);
+  background-attachment: fixed;
+}
+
+.panel {
+  backdrop-filter: blur(14px);
+  box-shadow: 0 22px 60px rgba(3, 7, 18, 0.45);
+}
+
+.control-pill {
+  box-shadow: 0 10px 24px rgba(2, 6, 23, 0.35);
+}
+
+.message-pill {
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.45);
 }
 
 .tile {
@@ -37,29 +63,33 @@ body {
   font-size: clamp(1rem, 3.5vw, 1.25rem);
   font-weight: 600;
   text-transform: uppercase;
-  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .tile--active {
-  box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.35);
+  box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.35), 0 12px 24px rgba(8, 12, 20, 0.35);
+  transform: translateY(-1px);
 }
 
 .tile--correct {
   background: var(--color-correct);
   color: #0b0e14;
   border-color: var(--color-correct);
+  animation: tile-reveal 260ms ease;
 }
 
 .tile--present {
   background: var(--color-present);
   color: #0b0e14;
   border-color: var(--color-present);
+  animation: tile-reveal 260ms ease;
 }
 
 .tile--absent {
   background: var(--color-absent);
   color: #e5e7eb;
   border-color: rgba(229, 231, 235, 0.1);
+  animation: tile-reveal 260ms ease;
 }
 
 .key {
@@ -67,16 +97,22 @@ body {
   padding: 0.5rem 0.6rem;
   border-radius: 0.7rem;
   border: 1px solid var(--color-key-border);
-  background: var(--color-key);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.12)), var(--color-key);
   color: #e5e7eb;
   font-size: clamp(0.7rem, 2.8vw, 0.85rem);
   font-weight: 600;
   text-transform: uppercase;
-  transition: transform 0.1s ease, background 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.1s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 8px 18px rgba(3, 7, 18, 0.35);
 }
 
 .key:hover {
   transform: translateY(-1px);
+}
+
+.key:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 4px 10px rgba(3, 7, 18, 0.35);
 }
 
 .key--action {
@@ -100,4 +136,27 @@ body {
 .key--absent {
   background: var(--color-absent);
   border-color: rgba(229, 231, 235, 0.1);
+}
+
+@keyframes tile-reveal {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile,
+  .key,
+  .key:hover,
+  .tile--correct,
+  .tile--present,
+  .tile--absent {
+    transition: none;
+    animation: none;
+  }
 }

@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { GuessEvaluation, LetterState } from '../game/types';
 
 const stateClass: Record<LetterState, string> = {
@@ -12,7 +13,7 @@ type GameBoardProps = {
   activeRowIndex: number;
 };
 
-export default function GameBoard({ rows, activeRowIndex }: GameBoardProps) {
+function GameBoard({ rows, activeRowIndex }: GameBoardProps) {
   return (
     <section aria-label="Guess board" className="grid gap-3">
       {rows.map((row, rowIndex) => (
@@ -33,3 +34,5 @@ export default function GameBoard({ rows, activeRowIndex }: GameBoardProps) {
     </section>
   );
 }
+
+export default memo(GameBoard);
