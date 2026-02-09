@@ -1,17 +1,25 @@
 import { MAX_ATTEMPTS, WORD_LENGTH } from './constants';
 import type { GuessEvaluation, LetterState } from './types';
-import { WORDS } from '../data/words';
+import type { Language } from '../i18n';
+import { getWordList, getWordSet } from './words';
 
-const WORD_SET = new Set(WORDS);
+export const normalizeWord = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .replace(/[^A-Z]/g, '');
 
-export const normalizeWord = (value: string) => value.toUpperCase().replace(/[^A-Z]/g, '');
-
-export const isValidWord = (value: string) => {
+export const isValidWord = (value: string, language: Language) => {
   const normalized = normalizeWord(value);
-  return normalized.length === WORD_LENGTH && WORD_SET.has(normalized);
+  const wordSet = getWordSet(language);
+  return normalized.length === WORD_LENGTH && wordSet.has(normalized);
 };
 
-export const getRandomWord = () => WORDS[Math.floor(Math.random() * WORDS.length)];
+export const getRandomWord = (language: Language) => {
+  const list = getWordList(language);
+  return list[Math.floor(Math.random() * list.length)];
+};
 
 export const evaluateGuess = (guess: string, solution: string): GuessEvaluation => {
   const cleanGuess = normalizeWord(guess).padEnd(WORD_LENGTH, ' ');
@@ -54,7 +62,12 @@ export const buildEmptyEvaluation = (): GuessEvaluation => ({
   states: Array(WORD_LENGTH).fill('empty')
 });
 
-export const getHardModeViolation = (guess: string, evaluations: GuessEvaluation[]): string | null => {
+export const getHardModeViolation = (
+  guess: string,
+  evaluations: GuessEvaluation[],
+  formatPosition: (position: number, letter: string) => string,
+  formatInclude: (count: number, letter: string) => string
+): string | null => {
   if (evaluations.length === 0) return null;
 
   const requiredPositions = new Map<number, string>();
@@ -83,7 +96,7 @@ export const getHardModeViolation = (guess: string, evaluations: GuessEvaluation
 
   for (const [index, letter] of requiredPositions.entries()) {
     if (guessLetters[index] !== letter) {
-      return `Hard mode: position ${index + 1} must be ${letter}`;
+      return formatPosition(index + 1, letter);
     }
   }
 
@@ -95,8 +108,7 @@ export const getHardModeViolation = (guess: string, evaluations: GuessEvaluation
 
   for (const [letter, required] of Object.entries(requiredCounts)) {
     if ((guessCounts[letter] ?? 0) < required) {
-      const suffix = required > 1 ? `'${letter}'s` : `'${letter}'`;
-      return `Hard mode: include at least ${required} ${suffix}`;
+      return formatInclude(required, letter);
     }
   }
 

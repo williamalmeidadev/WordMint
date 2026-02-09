@@ -20,16 +20,19 @@ type KeyboardProps = {
   onLetter: (letter: string) => void;
   onEnter: () => void;
   onBackspace: () => void;
+  enterLabel: string;
+  backspaceLabel: string;
+  keyboardLabel: string;
 };
 
-function Keyboard({ letterStates, onLetter, onEnter, onBackspace }: KeyboardProps) {
+function Keyboard({ letterStates, onLetter, onEnter, onBackspace, enterLabel, backspaceLabel, keyboardLabel }: KeyboardProps) {
   const handleLetterClick = (event: MouseEvent<HTMLButtonElement>) => {
     const key = event.currentTarget.dataset.key;
     if (key) onLetter(key);
   };
 
   return (
-    <section aria-label="On screen keyboard" className="flex flex-col gap-1.5 sm:gap-2">
+    <section aria-label={keyboardLabel} className="flex flex-col gap-1.5 sm:gap-2">
       {rows.map((row, rowIndex) => (
         <div
           key={`key-row-${rowIndex}`}
@@ -44,7 +47,7 @@ function Keyboard({ letterStates, onLetter, onEnter, onBackspace }: KeyboardProp
                   onClick={onEnter}
                   className="key key--action key--wide"
                 >
-                  Enter
+                  {enterLabel}
                 </button>
               );
             }
@@ -55,9 +58,9 @@ function Keyboard({ letterStates, onLetter, onEnter, onBackspace }: KeyboardProp
                   type="button"
                   onClick={onBackspace}
                   className="key key--action key--wide"
-                  aria-label="Backspace"
+                  aria-label={backspaceLabel}
                 >
-                  Back
+                  {backspaceLabel}
                 </button>
               );
             }
