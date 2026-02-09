@@ -54,6 +54,55 @@ export const buildEmptyEvaluation = (): GuessEvaluation => ({
   states: Array(WORD_LENGTH).fill('empty')
 });
 
+export const getHardModeViolation = (guess: string, evaluations: GuessEvaluation[]): string | null => {
+  if (evaluations.length === 0) return null;
+
+  const requiredPositions = new Map<number, string>();
+  const requiredCounts: Record<string, number> = {};
+
+  evaluations.forEach((evaluation) => {
+    const countsThisGuess: Record<string, number> = {};
+    evaluation.letters.forEach((letter, index) => {
+      const state = evaluation.states[index];
+      if (!letter) return;
+      if (state === 'correct') {
+        requiredPositions.set(index, letter);
+      }
+      if (state === 'correct' || state === 'present') {
+        countsThisGuess[letter] = (countsThisGuess[letter] ?? 0) + 1;
+      }
+    });
+
+    Object.entries(countsThisGuess).forEach(([letter, count]) => {
+      requiredCounts[letter] = Math.max(requiredCounts[letter] ?? 0, count);
+    });
+  });
+
+  const cleanGuess = normalizeWord(guess).padEnd(WORD_LENGTH, ' ').slice(0, WORD_LENGTH);
+  const guessLetters = cleanGuess.split('');
+
+  for (const [index, letter] of requiredPositions.entries()) {
+    if (guessLetters[index] !== letter) {
+      return `Hard mode: position ${index + 1} must be ${letter}`;
+    }
+  }
+
+  const guessCounts: Record<string, number> = {};
+  guessLetters.forEach((letter) => {
+    if (!letter || letter === ' ') return;
+    guessCounts[letter] = (guessCounts[letter] ?? 0) + 1;
+  });
+
+  for (const [letter, required] of Object.entries(requiredCounts)) {
+    if ((guessCounts[letter] ?? 0) < required) {
+      const suffix = required > 1 ? `'${letter}'s` : `'${letter}'`;
+      return `Hard mode: include at least ${required} ${suffix}`;
+    }
+  }
+
+  return null;
+};
+
 export const isWinningGuess = (guess: string, solution: string) =>
   normalizeWord(guess) === normalizeWord(solution);
 

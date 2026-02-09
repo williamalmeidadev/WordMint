@@ -10,6 +10,7 @@ export type GameState = {
   attemptIndex: number;
   message: string | null;
   colorBlindMode: boolean;
+  hardMode: boolean;
 };
 
 export type GameAction =
@@ -18,11 +19,13 @@ export type GameAction =
   | { type: 'SUBMIT_GUESS'; guess: string; evaluation: GuessEvaluation; status: GameStatus; message?: string }
   | { type: 'SET_MESSAGE'; message: string | null }
   | { type: 'RESET_GAME'; solution: string }
-  | { type: 'TOGGLE_COLOR_BLIND' };
+  | { type: 'TOGGLE_COLOR_BLIND' }
+  | { type: 'TOGGLE_HARD_MODE' };
 
 export const createInitialState = (
   solution: string,
-  colorBlindMode = false
+  colorBlindMode = false,
+  hardMode = false
 ): GameState => ({
   solution,
   guesses: [],
@@ -31,7 +34,8 @@ export const createInitialState = (
   status: 'playing',
   attemptIndex: 0,
   message: null,
-  colorBlindMode
+  colorBlindMode,
+  hardMode
 });
 
 export const gameReducer = (state: GameState, action: GameAction): GameState => {
@@ -83,6 +87,8 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
       };
     case 'TOGGLE_COLOR_BLIND':
       return { ...state, colorBlindMode: !state.colorBlindMode };
+    case 'TOGGLE_HARD_MODE':
+      return { ...state, hardMode: !state.hardMode };
     default:
       return state;
   }

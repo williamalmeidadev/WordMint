@@ -3,9 +3,11 @@ import { memo } from 'react';
 type HeaderProps = {
   colorBlindMode: boolean;
   onToggleColorBlind: () => void;
+  hardMode: boolean;
+  onToggleHardMode: () => void;
 };
 
-function Header({ colorBlindMode, onToggleColorBlind }: HeaderProps) {
+function Header({ colorBlindMode, onToggleColorBlind, hardMode, onToggleHardMode }: HeaderProps) {
   return (
     <header className="panel flex flex-col gap-5 rounded-2xl border border-fog/10 bg-slate/70 px-4 py-5 sm:gap-6 sm:rounded-3xl sm:px-6 sm:py-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
@@ -17,18 +19,30 @@ function Header({ colorBlindMode, onToggleColorBlind }: HeaderProps) {
           </p>
         </div>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <p className="text-xs uppercase tracking-[0.35em] text-fog/60">Accessibility</p>
-        <button
-          type="button"
-          onClick={onToggleColorBlind}
-          className={`control-pill rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] transition ${
-            colorBlindMode ? 'bg-lemon text-ink' : 'bg-ink/60 text-fog'
-          }`}
-          aria-pressed={colorBlindMode}
-        >
-          Color-blind palette {colorBlindMode ? 'on' : 'off'}
-        </button>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs uppercase tracking-[0.35em] text-fog/60">Preferences</p>
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={onToggleHardMode}
+            className={`control-pill rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] transition ${
+              hardMode ? 'bg-mint text-ink' : 'bg-ink/60 text-fog'
+            }`}
+            aria-pressed={hardMode}
+          >
+            Hard mode {hardMode ? 'on' : 'off'}
+          </button>
+          <button
+            type="button"
+            onClick={onToggleColorBlind}
+            className={`control-pill rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] transition ${
+              colorBlindMode ? 'bg-lemon text-ink' : 'bg-ink/60 text-fog'
+            }`}
+            aria-pressed={colorBlindMode}
+          >
+            Color-blind palette {colorBlindMode ? 'on' : 'off'}
+          </button>
+        </div>
       </div>
     </header>
   );

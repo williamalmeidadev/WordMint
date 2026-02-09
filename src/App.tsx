@@ -12,6 +12,7 @@ import {
   buildShareText,
   evaluateGuess,
   getRandomWord,
+  getHardModeViolation,
   isValidWord,
   isWinningGuess,
   normalizeWord
@@ -27,7 +28,7 @@ const buildActiveRow = (currentGuess: string): GuessEvaluation => ({
 
 const hydrateState = () => {
   const settings = loadSettings();
-  return createInitialState(getRandomWord(), settings.colorBlindMode);
+  return createInitialState(getRandomWord(), settings.colorBlindMode, settings.hardMode);
 };
 
 export default function App() {
@@ -35,7 +36,8 @@ export default function App() {
   const [stats, setStats] = useState(loadStats);
   const recordedResultRef = useRef<string | null>(null);
 
-  const { evaluations, currentGuess, attemptIndex, message, status, colorBlindMode, solution, guesses } = state;
+  const { evaluations, currentGuess, attemptIndex, message, status, colorBlindMode, hardMode, solution, guesses } =
+    state;
 
   const rows = useMemo(() => {
     const filledRows = evaluations.map((evaluation) => evaluation);
@@ -53,8 +55,8 @@ export default function App() {
   }, [colorBlindMode]);
 
   useEffect(() => {
-    saveSettings({ colorBlindMode });
-  }, [colorBlindMode]);
+    saveSettings({ colorBlindMode, hardMode });
+  }, [colorBlindMode, hardMode]);
 
   useEffect(() => {
     if (status === 'playing') {
@@ -99,6 +101,13 @@ export default function App() {
     if (currentGuess.length < WORD_LENGTH) {
       setMessage('Not enough letters');
       return;
+    }
+    if (hardMode) {
+      const violation = getHardModeViolation(currentGuess, evaluations);
+      if (violation) {
+        setMessage(violation);
+        return;
+      }
     }
     if (!isValidWord(currentGuess)) {
       setMessage('Not in word list');
@@ -185,6 +194,8 @@ export default function App() {
         <Header
           colorBlindMode={colorBlindMode}
           onToggleColorBlind={() => dispatch({ type: 'TOGGLE_COLOR_BLIND' })}
+          hardMode={hardMode}
+          onToggleHardMode={() => dispatch({ type: 'TOGGLE_HARD_MODE' })}
         />
 
         <section className="panel grid gap-6 rounded-2xl border border-fog/10 bg-slate/60 px-4 py-5 sm:rounded-3xl sm:px-6 sm:py-6">

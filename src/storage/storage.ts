@@ -12,10 +12,12 @@ export type GameStats = {
 
 export type GameSettings = {
   colorBlindMode: boolean;
+  hardMode: boolean;
 };
 
 export const createDefaultSettings = (): GameSettings => ({
-  colorBlindMode: false
+  colorBlindMode: false,
+  hardMode: false
 });
 
 export const createEmptyStats = (): GameStats => ({
@@ -50,6 +52,7 @@ export const loadSettings = (): GameSettings => {
     if (!raw) return createDefaultSettings();
     const parsed = JSON.parse(raw) as GameSettings;
     if (typeof parsed.colorBlindMode !== 'boolean') return createDefaultSettings();
+    if (typeof parsed.hardMode !== 'boolean') return createDefaultSettings();
     return parsed;
   } catch {
     return createDefaultSettings();
