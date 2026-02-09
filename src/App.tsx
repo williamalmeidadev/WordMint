@@ -96,6 +96,12 @@ export default function App() {
     dispatch({ type: 'SET_MESSAGE', message: nextMessage });
   }, []);
 
+  useEffect(() => {
+    if (!message || status !== 'playing') return;
+    const timer = window.setTimeout(() => setMessage(null), 2200);
+    return () => window.clearTimeout(timer);
+  }, [message, setMessage, status]);
+
   const submitGuess = useCallback(() => {
     if (status !== 'playing') return;
     if (currentGuess.length < WORD_LENGTH) {
