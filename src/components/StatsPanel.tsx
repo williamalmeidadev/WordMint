@@ -25,6 +25,7 @@ type StatsPanelProps = {
 
 function StatsPanel({ stats, status, onShare, shareAvailable, strings }: StatsPanelProps) {
   const winRate = stats.gamesPlayed ? stats.gamesWon / stats.gamesPlayed : 0;
+  const maxDistribution = Math.max(1, ...stats.guessDistribution);
 
   return (
     <section className="panel grid gap-4 rounded-2xl border border-fog/10 bg-slate/60 px-4 py-5 sm:rounded-3xl sm:px-6 sm:py-6">
@@ -72,7 +73,7 @@ function StatsPanel({ stats, status, onShare, shareAvailable, strings }: StatsPa
               <div className="h-2 flex-1 rounded-full bg-ink/70">
                 <div
                   className="h-2 rounded-full bg-mint"
-                  style={{ width: `${Math.min(value * 12, 100)}%` }}
+                  style={{ width: `${Math.round((value / maxDistribution) * 100)}%` }}
                 />
               </div>
               <span className="w-6 text-right text-fog/60">{value}</span>
