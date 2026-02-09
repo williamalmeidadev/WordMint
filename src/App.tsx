@@ -78,6 +78,10 @@ export default function App() {
   }, [theme]);
 
   useEffect(() => {
+    document.documentElement.setAttribute('lang', language);
+  }, [language]);
+
+  useEffect(() => {
     saveSettings({ colorBlindMode, hardMode, theme, language });
   }, [colorBlindMode, hardMode, theme, language]);
 

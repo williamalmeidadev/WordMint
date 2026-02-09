@@ -47,6 +47,7 @@ function Header({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs uppercase tracking-[0.35em] text-fog/60">{strings.preferences}</p>
         <div className="flex flex-wrap gap-3">
+          <span className="sr-only">{strings.languageLabel}</span>
           {LANGUAGE_OPTIONS.map((option) => (
             <button
               key={option.code}
