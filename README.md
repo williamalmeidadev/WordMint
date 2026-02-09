@@ -14,7 +14,6 @@ WordMint is a browser-based word guessing game inspired by classic five-letter p
 - Tailwind CSS
 - State management with `useReducer`
 - Persistence via `localStorage`
-- Testing with Vitest
 
 ## Getting Started
 ```bash
@@ -28,7 +27,6 @@ npm run dev
 - `npm run preview` - preview production build
 - `npm run lint` - lint the codebase
 - `npm run format` - check formatting
-- `npm run test` - run tests
 
 ## Word Selection
 Each round uses a random word from the curated list, fully offline.
@@ -39,7 +37,14 @@ Stored under these `localStorage` keys:
 - `wordmint-settings` - user preferences (color-blind mode)
 
 ## Deployment (GitHub Pages)
-The app is fully static and uses `base: "/"` in `vite.config.ts`. Build output is in `dist/` and can be deployed to GitHub Pages via any static hosting workflow.
+This project is prepped for GitHub Pages with a workflow in `.github/workflows/deploy.yml`.
+
+Steps:
+1. Ensure the repository is named `WordMint` (or update `base` in `vite.config.ts` to `/<repo-name>/`).
+2. Push to the `main` branch.
+3. In GitHub, enable Pages for the repository and set the source to `GitHub Actions`.
+
+The build output is `dist/` and is deployed automatically on pushes to `main`.
 
 ## Roadmap
 - Expand the English word list
