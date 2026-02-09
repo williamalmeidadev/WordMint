@@ -26,7 +26,7 @@
 
 :root[data-theme='light'] {
   color-scheme: light;
-  --color-absent: #cbd5e1;
+  --color-absent: #94a3b8;
   --color-key: #e2e8f0;
   --color-key-border: rgba(15, 23, 42, 0.2);
   --glow-mint: rgba(45, 212, 191, 0.18);
@@ -99,6 +99,11 @@ body {
   border-color: rgba(15, 23, 42, 0.16);
 }
 
+:root[data-theme='light'] .tile--absent {
+  color: #0b0e14;
+  border-color: rgba(15, 23, 42, 0.2);
+}
+
 .tile--active {
   box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.35), 0 12px 24px rgba(8, 12, 20, 0.35);
   transform: translateY(-1px);
@@ -143,6 +148,12 @@ body {
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.02), rgba(15, 23, 42, 0.08)), var(--color-key);
   color: #0b0e14;
   box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
+}
+
+:root[data-theme='light'] .key--action {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(15, 23, 42, 0.2);
+  color: #0b0e14;
 }
 
 .keyboard-row .key {
@@ -221,6 +232,12 @@ body {
 
 :root[data-theme='light'] .bg-ink\\/70 {
   background-color: rgba(255, 255, 255, 0.78) !important;
+}
+
+:root[data-theme='light'] .message-pill {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  color: #0b0e14;
 }
 
 :root[data-theme='light'] .border-fog\\/10 {
