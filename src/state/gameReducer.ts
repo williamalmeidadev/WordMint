@@ -11,6 +11,7 @@ export type GameState = {
   message: string | null;
   colorBlindMode: boolean;
   hardMode: boolean;
+  theme: 'dark' | 'light';
 };
 
 export type GameAction =
@@ -20,12 +21,14 @@ export type GameAction =
   | { type: 'SET_MESSAGE'; message: string | null }
   | { type: 'RESET_GAME'; solution: string }
   | { type: 'TOGGLE_COLOR_BLIND' }
-  | { type: 'TOGGLE_HARD_MODE' };
+  | { type: 'TOGGLE_HARD_MODE' }
+  | { type: 'TOGGLE_THEME' };
 
 export const createInitialState = (
   solution: string,
   colorBlindMode = false,
-  hardMode = false
+  hardMode = false,
+  theme: 'dark' | 'light' = 'dark'
 ): GameState => ({
   solution,
   guesses: [],
@@ -35,7 +38,8 @@ export const createInitialState = (
   attemptIndex: 0,
   message: null,
   colorBlindMode,
-  hardMode
+  hardMode,
+  theme
 });
 
 export const gameReducer = (state: GameState, action: GameAction): GameState => {
@@ -89,6 +93,8 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
       return { ...state, colorBlindMode: !state.colorBlindMode };
     case 'TOGGLE_HARD_MODE':
       return { ...state, hardMode: !state.hardMode };
+    case 'TOGGLE_THEME':
+      return { ...state, theme: state.theme === 'dark' ? 'light' : 'dark' };
     default:
       return state;
   }

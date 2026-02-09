@@ -28,7 +28,7 @@ const buildActiveRow = (currentGuess: string): GuessEvaluation => ({
 
 const hydrateState = () => {
   const settings = loadSettings();
-  return createInitialState(getRandomWord(), settings.colorBlindMode, settings.hardMode);
+  return createInitialState(getRandomWord(), settings.colorBlindMode, settings.hardMode, settings.theme);
 };
 
 export default function App() {
@@ -36,7 +36,7 @@ export default function App() {
   const [stats, setStats] = useState(loadStats);
   const recordedResultRef = useRef<string | null>(null);
 
-  const { evaluations, currentGuess, attemptIndex, message, status, colorBlindMode, hardMode, solution, guesses } =
+  const { evaluations, currentGuess, attemptIndex, message, status, colorBlindMode, hardMode, theme, solution, guesses } =
     state;
 
   const rows = useMemo(() => {
@@ -55,8 +55,12 @@ export default function App() {
   }, [colorBlindMode]);
 
   useEffect(() => {
-    saveSettings({ colorBlindMode, hardMode });
-  }, [colorBlindMode, hardMode]);
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    saveSettings({ colorBlindMode, hardMode, theme });
+  }, [colorBlindMode, hardMode, theme]);
 
   useEffect(() => {
     if (status === 'playing') {
@@ -202,6 +206,8 @@ export default function App() {
           onToggleColorBlind={() => dispatch({ type: 'TOGGLE_COLOR_BLIND' })}
           hardMode={hardMode}
           onToggleHardMode={() => dispatch({ type: 'TOGGLE_HARD_MODE' })}
+          theme={theme}
+          onToggleTheme={() => dispatch({ type: 'TOGGLE_THEME' })}
         />
 
         <section className="panel grid gap-6 rounded-2xl border border-fog/10 bg-slate/60 px-4 py-5 sm:rounded-3xl sm:px-6 sm:py-6">

@@ -5,9 +5,18 @@ type HeaderProps = {
   onToggleColorBlind: () => void;
   hardMode: boolean;
   onToggleHardMode: () => void;
+  theme: 'dark' | 'light';
+  onToggleTheme: () => void;
 };
 
-function Header({ colorBlindMode, onToggleColorBlind, hardMode, onToggleHardMode }: HeaderProps) {
+function Header({
+  colorBlindMode,
+  onToggleColorBlind,
+  hardMode,
+  onToggleHardMode,
+  theme,
+  onToggleTheme
+}: HeaderProps) {
   return (
     <header className="panel flex flex-col gap-5 rounded-2xl border border-fog/10 bg-slate/70 px-4 py-5 sm:gap-6 sm:rounded-3xl sm:px-6 sm:py-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
@@ -22,6 +31,16 @@ function Header({ colorBlindMode, onToggleColorBlind, hardMode, onToggleHardMode
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs uppercase tracking-[0.35em] text-fog/60">Preferences</p>
         <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={onToggleTheme}
+            className={`control-pill rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] transition ${
+              theme === 'light' ? 'bg-fog text-ink' : 'bg-ink/60 text-fog'
+            }`}
+            aria-pressed={theme === 'light'}
+          >
+            Light theme {theme === 'light' ? 'on' : 'off'}
+          </button>
           <button
             type="button"
             onClick={onToggleHardMode}

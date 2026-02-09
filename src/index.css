@@ -24,10 +24,23 @@
   --color-present: #f97316;
 }
 
+:root[data-theme='light'] {
+  color-scheme: light;
+  --color-absent: #cbd5e1;
+  --color-key: #e2e8f0;
+  --color-key-border: rgba(15, 23, 42, 0.2);
+  --glow-mint: rgba(45, 212, 191, 0.18);
+  --glow-lemon: rgba(250, 204, 21, 0.14);
+}
+
 body {
   margin: 0;
   min-height: 100%;
   background: #0b0e14;
+}
+
+:root[data-theme='light'] body {
+  background: #f5f7fb;
 }
 
 .app-shell {
@@ -39,13 +52,29 @@ body {
   background-attachment: fixed;
 }
 
+:root[data-theme='light'] .app-shell {
+  background: radial-gradient(1200px 600px at 8% -12%, rgba(45, 212, 191, 0.2), transparent 60%),
+    radial-gradient(900px 600px at 92% -5%, rgba(250, 204, 21, 0.2), transparent 55%),
+    linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  background-attachment: scroll;
+}
+
 .panel {
   backdrop-filter: blur(14px);
   box-shadow: 0 22px 60px rgba(3, 7, 18, 0.45);
 }
 
+:root[data-theme='light'] .panel {
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+}
+
 .control-pill {
   box-shadow: 0 10px 24px rgba(2, 6, 23, 0.35);
+}
+
+:root[data-theme='light'] .control-pill,
+:root[data-theme='light'] .message-pill {
+  box-shadow: 0 12px 22px rgba(15, 23, 42, 0.12);
 }
 
 .message-pill {
@@ -64,6 +93,10 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+:root[data-theme='light'] .tile {
+  border-color: rgba(15, 23, 42, 0.16);
 }
 
 .tile--active {
@@ -106,6 +139,12 @@ body {
   box-shadow: 0 8px 18px rgba(3, 7, 18, 0.35);
 }
 
+:root[data-theme='light'] .key {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.02), rgba(15, 23, 42, 0.08)), var(--color-key);
+  color: #0b0e14;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
+}
+
 .keyboard-row .key {
   flex: 1 1 0;
   max-width: 3.1rem;
@@ -146,6 +185,50 @@ body {
 .key--absent {
   background: var(--color-absent);
   border-color: rgba(229, 231, 235, 0.1);
+}
+
+:root[data-theme='light'] .text-fog {
+  color: #0b0e14 !important;
+}
+
+:root[data-theme='light'] .text-fog\\/80 {
+  color: rgba(15, 23, 42, 0.8) !important;
+}
+
+:root[data-theme='light'] .text-fog\\/70 {
+  color: rgba(15, 23, 42, 0.7) !important;
+}
+
+:root[data-theme='light'] .text-fog\\/60 {
+  color: rgba(15, 23, 42, 0.6) !important;
+}
+
+:root[data-theme='light'] .text-fog\\/50 {
+  color: rgba(15, 23, 42, 0.5) !important;
+}
+
+:root[data-theme='light'] .bg-slate\\/60 {
+  background-color: rgba(255, 255, 255, 0.72) !important;
+}
+
+:root[data-theme='light'] .bg-slate\\/70 {
+  background-color: rgba(255, 255, 255, 0.82) !important;
+}
+
+:root[data-theme='light'] .bg-ink\\/60 {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+}
+
+:root[data-theme='light'] .bg-ink\\/70 {
+  background-color: rgba(255, 255, 255, 0.78) !important;
+}
+
+:root[data-theme='light'] .border-fog\\/10 {
+  border-color: rgba(15, 23, 42, 0.12) !important;
+}
+
+:root[data-theme='light'] .border-fog\\/20 {
+  border-color: rgba(15, 23, 42, 0.2) !important;
 }
 
 @keyframes tile-reveal {
