@@ -1,4 +1,5 @@
 import { MAX_ATTEMPTS } from '../game/constants';
+import type { Language } from '../i18n';
 const STATS_KEY = 'wordmint-stats';
 const SETTINGS_KEY = 'wordmint-settings';
 
@@ -14,12 +15,14 @@ export type GameSettings = {
   colorBlindMode: boolean;
   hardMode: boolean;
   theme: 'dark' | 'light';
+  language: Language;
 };
 
 export const createDefaultSettings = (): GameSettings => ({
   colorBlindMode: false,
   hardMode: false,
-  theme: 'dark'
+  theme: 'dark',
+  language: 'pt'
 });
 
 export const createEmptyStats = (): GameStats => ({
@@ -56,6 +59,7 @@ export const loadSettings = (): GameSettings => {
     if (typeof parsed.colorBlindMode !== 'boolean') return createDefaultSettings();
     if (typeof parsed.hardMode !== 'boolean') return createDefaultSettings();
     if (parsed.theme !== 'dark' && parsed.theme !== 'light') return createDefaultSettings();
+    if (parsed.language !== 'pt' && parsed.language !== 'en') return createDefaultSettings();
     return parsed;
   } catch {
     return createDefaultSettings();

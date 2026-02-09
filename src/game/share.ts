@@ -1,5 +1,4 @@
 import type { GameStatus, GuessEvaluation } from './types';
-import { MAX_ATTEMPTS } from './constants';
 
 const emojiMap = {
   correct: '🟩',
@@ -11,13 +10,14 @@ const emojiMap = {
 type SharePayload = {
   status: GameStatus;
   evaluations: GuessEvaluation[];
+  header: (attempts: number | 'X' | '-') => string;
 };
 
-export const buildShareText = ({ status, evaluations }: SharePayload) => {
+export const buildShareText = ({ status, evaluations, header }: SharePayload) => {
   const attempts = status === 'won' ? evaluations.length : status === 'lost' ? 'X' : '-';
-  const header = `WordMint Random ${attempts}/${MAX_ATTEMPTS}`;
+  const shareHeader = header(attempts);
   const grid = evaluations
     .map((evaluation) => evaluation.states.map((state) => emojiMap[state]).join(''))
     .join('\n');
-  return `${header}\n${grid}`.trim();
+  return `${shareHeader}\n${grid}`.trim();
 };

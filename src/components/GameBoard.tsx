@@ -11,11 +11,13 @@ const stateClass: Record<LetterState, string> = {
 type GameBoardProps = {
   rows: GuessEvaluation[];
   activeRowIndex: number;
+  tileAria: (row: number, col: number, state: string) => string;
+  boardLabel: string;
 };
 
-function GameBoard({ rows, activeRowIndex }: GameBoardProps) {
+function GameBoard({ rows, activeRowIndex, tileAria, boardLabel }: GameBoardProps) {
   return (
-    <section aria-label="Guess board" className="grid gap-2 sm:gap-3">
+    <section aria-label={boardLabel} className="grid gap-2 sm:gap-3">
       {rows.map((row, rowIndex) => (
         <div key={`row-${rowIndex}`} className="grid grid-cols-5 gap-1.5 sm:gap-2">
           {row.letters.map((letter, index) => (
@@ -24,7 +26,7 @@ function GameBoard({ rows, activeRowIndex }: GameBoardProps) {
               className={`${stateClass[row.states[index]]} ${
                 rowIndex === activeRowIndex ? 'tile--active' : ''
               }`}
-              aria-label={`Row ${rowIndex + 1} letter ${index + 1} ${row.states[index]}`}
+              aria-label={tileAria(rowIndex + 1, index + 1, row.states[index])}
             >
               {letter}
             </div>

@@ -20,6 +20,7 @@ import {
 import { createInitialState, gameReducer } from './state/gameReducer';
 import type { GuessEvaluation } from './game/types';
 import { loadSettings, loadStats, saveSettings, saveStats } from './storage/storage';
+import { getStrings } from './i18n';
 
 const buildActiveRow = (currentGuess: string): GuessEvaluation => ({
   letters: currentGuess.padEnd(WORD_LENGTH, ' ').split('').map((letter) => letter.trim()),
@@ -28,7 +29,13 @@ const buildActiveRow = (currentGuess: string): GuessEvaluation => ({
 
 const hydrateState = () => {
   const settings = loadSettings();
-  return createInitialState(getRandomWord(), settings.colorBlindMode, settings.hardMode, settings.theme);
+  return createInitialState(
+    getRandomWord(settings.language),
+    settings.colorBlindMode,
+    settings.hardMode,
+    settings.theme,
+    settings.language
+  );
 };
 
 export default function App() {
@@ -36,8 +43,20 @@ export default function App() {
   const [stats, setStats] = useState(loadStats);
   const recordedResultRef = useRef<string | null>(null);
 
-  const { evaluations, currentGuess, attemptIndex, message, status, colorBlindMode, hardMode, theme, solution, guesses } =
-    state;
+  const {
+    evaluations,
+    currentGuess,
+    attemptIndex,
+    message,
+    status,
+    colorBlindMode,
+    hardMode,
+    theme,
+    solution,
+    guesses,
+    language
+  } = state;
+  const strings = getStrings(language);
 
   const rows = useMemo(() => {
     const filledRows = evaluations.map((evaluation) => evaluation);
@@ -59,8 +78,8 @@ export default function App() {
   }, [theme]);
 
   useEffect(() => {
-    saveSettings({ colorBlindMode, hardMode, theme });
-  }, [colorBlindMode, hardMode, theme]);
+    saveSettings({ colorBlindMode, hardMode, theme, language });
+  }, [colorBlindMode, hardMode, theme, language]);
 
   useEffect(() => {
     if (status === 'playing') {
@@ -109,18 +128,23 @@ export default function App() {
   const submitGuess = useCallback(() => {
     if (status !== 'playing') return;
     if (currentGuess.length < WORD_LENGTH) {
-      setMessage('Not enough letters');
+      setMessage(strings.notEnoughLetters);
       return;
     }
     if (hardMode) {
-      const violation = getHardModeViolation(currentGuess, evaluations);
+      const violation = getHardModeViolation(
+        currentGuess,
+        evaluations,
+        strings.hardModePosition,
+        strings.hardModeInclude
+      );
       if (violation) {
         setMessage(violation);
         return;
       }
     }
-    if (!isValidWord(currentGuess)) {
-      setMessage('Not in word list');
+    if (!isValidWord(currentGuess, language)) {
+      setMessage(strings.notInWordList);
       return;
     }
 
@@ -128,9 +152,9 @@ export default function App() {
     const isWin = isWinningGuess(currentGuess, solution);
     const nextStatus = isWin ? 'won' : attemptIndex + 1 >= MAX_ATTEMPTS ? 'lost' : 'playing';
     const nextMessage = isWin
-      ? `Solved in ${attemptIndex + 1} ${attemptIndex + 1 === 1 ? 'try' : 'tries'}`
+      ? strings.solvedIn(attemptIndex + 1)
       : nextStatus === 'lost'
-        ? `The word was ${solution}`
+        ? strings.wordWas(solution)
         : null;
 
     dispatch({
@@ -140,7 +164,7 @@ export default function App() {
       status: nextStatus,
       message: nextMessage ?? undefined
     });
-  }, [attemptIndex, currentGuess, setMessage, solution, status]);
+  }, [attemptIndex, currentGuess, evaluations, hardMode, language, setMessage, solution, status, strings]);
 
   const handleLetter = useCallback(
     (letter: string) => {
@@ -156,25 +180,38 @@ export default function App() {
   }, []);
 
   const resetGame = useCallback(() => {
-    dispatch({ type: 'RESET_GAME', solution: getRandomWord() });
-  }, []);
+    dispatch({ type: 'RESET_GAME', solution: getRandomWord(language) });
+  }, [language]);
 
   const shareText = useMemo(() => {
     if (status === 'playing') return '';
     return buildShareText({
       status,
-      evaluations
+      evaluations,
+      header: strings.shareHeader
     });
-  }, [evaluations, status]);
+  }, [evaluations, status, strings]);
 
   const handleShare = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(shareText);
-      setMessage('Copied to clipboard');
+      setMessage(strings.copiedToClipboard);
     } catch {
-      setMessage('Clipboard unavailable');
+      setMessage(strings.clipboardUnavailable);
     }
-  }, [setMessage, shareText]);
+  }, [setMessage, shareText, strings]);
+
+  const handleLanguageChange = useCallback(
+    (nextLanguage: typeof language) => {
+      if (nextLanguage === language) return;
+      dispatch({
+        type: 'RESET_GAME',
+        solution: getRandomWord(nextLanguage),
+        language: nextLanguage
+      });
+    },
+    [language]
+  );
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -183,11 +220,11 @@ export default function App() {
         submitGuess();
         return;
       }
-      if (event.key === 'Backspace') {
-        event.preventDefault();
-        handleBackspace();
-        return;
-      }
+    if (event.key === 'Backspace') {
+      event.preventDefault();
+      handleBackspace();
+      return;
+    }
       if (/^[a-zA-Z]$/.test(event.key)) {
         event.preventDefault();
         handleLetter(event.key.toUpperCase());
@@ -208,16 +245,29 @@ export default function App() {
           onToggleHardMode={() => dispatch({ type: 'TOGGLE_HARD_MODE' })}
           theme={theme}
           onToggleTheme={() => dispatch({ type: 'TOGGLE_THEME' })}
+          language={language}
+          onLanguageChange={handleLanguageChange}
+          strings={{
+            appName: strings.appName,
+            heroTitle: strings.heroTitle,
+            heroSubtitle: strings.heroSubtitle,
+            preferences: strings.preferences,
+            themeToggle: strings.themeToggle,
+            hardModeToggle: strings.hardModeToggle,
+            colorBlindToggle: strings.colorBlindToggle,
+            languageLabel: strings.languageLabel,
+            languageOption: strings.languageOption
+          }}
         />
 
         <section className="panel grid gap-6 rounded-2xl border border-fog/10 bg-slate/60 px-4 py-5 sm:rounded-3xl sm:px-6 sm:py-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.35em] text-fog/50">random mode</p>
+              <p className="text-xs uppercase tracking-[0.35em] text-fog/50">{strings.randomMode}</p>
               <p className="text-base font-semibold sm:text-lg">
-                {status === 'playing' && 'Make your next guess'}
-                {status === 'won' && 'Great work!'}
-                {status === 'lost' && 'Better luck next round'}
+                {status === 'playing' && strings.statusPlaying}
+                {status === 'won' && strings.statusWon}
+                {status === 'lost' && strings.statusLost}
               </p>
             </div>
             <button
@@ -225,12 +275,17 @@ export default function App() {
               onClick={resetGame}
               className="control-pill w-full rounded-full border border-fog/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-fog/70 transition hover:border-mint hover:text-mint sm:w-auto"
             >
-              New word
+              {strings.newWord}
             </button>
           </div>
 
           <MessageBanner message={message} />
-          <GameBoard rows={rows} activeRowIndex={status === 'playing' ? evaluations.length : -1} />
+          <GameBoard
+            rows={rows}
+            activeRowIndex={status === 'playing' ? evaluations.length : -1}
+            tileAria={(row, col, state) => strings.tileAria(row, col, strings.stateLabel(state))}
+            boardLabel={strings.guessBoard}
+          />
         </section>
 
         <Keyboard
@@ -238,6 +293,9 @@ export default function App() {
           onLetter={handleLetter}
           onEnter={submitGuess}
           onBackspace={handleBackspace}
+          enterLabel={strings.enterKey}
+          backspaceLabel={strings.backspaceKey}
+          keyboardLabel={strings.onScreenKeyboard}
         />
 
         <StatsPanel
@@ -245,6 +303,18 @@ export default function App() {
           status={status}
           onShare={handleShare}
           shareAvailable={status !== 'playing'}
+          strings={{
+            statistics: strings.statistics,
+            progressSnapshot: strings.progressSnapshot,
+            shareResult: strings.shareResult,
+            games: strings.games,
+            winRate: strings.winRate,
+            currentStreak: strings.currentStreak,
+            maxStreak: strings.maxStreak,
+            guessDistribution: strings.guessDistribution,
+            finishRound: strings.finishRound,
+            resultRecorded: strings.resultRecorded
+          }}
         />
       </div>
     </main>

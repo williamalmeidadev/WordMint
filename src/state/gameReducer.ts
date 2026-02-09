@@ -1,5 +1,6 @@
 import { MAX_ATTEMPTS, WORD_LENGTH } from '../game/constants';
 import type { GameStatus, GuessEvaluation } from '../game/types';
+import type { Language } from '../i18n';
 
 export type GameState = {
   solution: string;
@@ -12,6 +13,7 @@ export type GameState = {
   colorBlindMode: boolean;
   hardMode: boolean;
   theme: 'dark' | 'light';
+  language: Language;
 };
 
 export type GameAction =
@@ -19,7 +21,7 @@ export type GameAction =
   | { type: 'REMOVE_LETTER' }
   | { type: 'SUBMIT_GUESS'; guess: string; evaluation: GuessEvaluation; status: GameStatus; message?: string }
   | { type: 'SET_MESSAGE'; message: string | null }
-  | { type: 'RESET_GAME'; solution: string }
+  | { type: 'RESET_GAME'; solution: string; language?: Language }
   | { type: 'TOGGLE_COLOR_BLIND' }
   | { type: 'TOGGLE_HARD_MODE' }
   | { type: 'TOGGLE_THEME' };
@@ -28,7 +30,8 @@ export const createInitialState = (
   solution: string,
   colorBlindMode = false,
   hardMode = false,
-  theme: 'dark' | 'light' = 'dark'
+  theme: 'dark' | 'light' = 'dark',
+  language: Language = 'pt'
 ): GameState => ({
   solution,
   guesses: [],
@@ -39,7 +42,8 @@ export const createInitialState = (
   message: null,
   colorBlindMode,
   hardMode,
-  theme
+  theme,
+  language
 });
 
 export const gameReducer = (state: GameState, action: GameAction): GameState => {
@@ -87,7 +91,8 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         currentGuess: '',
         status: 'playing',
         attemptIndex: 0,
-        message: null
+        message: null,
+        language: action.language ?? state.language
       };
     case 'TOGGLE_COLOR_BLIND':
       return { ...state, colorBlindMode: !state.colorBlindMode };

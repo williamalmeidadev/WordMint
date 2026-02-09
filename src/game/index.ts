@@ -3,3 +3,4 @@ export * from './logic';
 export * from './types';
 export * from './keyboard';
 export * from './share';
+export * from './words';
