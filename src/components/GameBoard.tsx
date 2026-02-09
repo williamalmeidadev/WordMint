@@ -15,9 +15,9 @@ type GameBoardProps = {
 
 function GameBoard({ rows, activeRowIndex }: GameBoardProps) {
   return (
-    <section aria-label="Guess board" className="grid gap-3">
+    <section aria-label="Guess board" className="grid gap-2 sm:gap-3">
       {rows.map((row, rowIndex) => (
-        <div key={`row-${rowIndex}`} className="grid grid-cols-5 gap-2">
+        <div key={`row-${rowIndex}`} className="grid grid-cols-5 gap-1.5 sm:gap-2">
           {row.letters.map((letter, index) => (
             <div
               key={`tile-${rowIndex}-${index}`}

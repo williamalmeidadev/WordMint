@@ -29,9 +29,12 @@ function Keyboard({ letterStates, onLetter, onEnter, onBackspace }: KeyboardProp
   };
 
   return (
-    <section aria-label="On screen keyboard" className="flex flex-col gap-2">
+    <section aria-label="On screen keyboard" className="flex flex-col gap-1.5 sm:gap-2">
       {rows.map((row, rowIndex) => (
-        <div key={`key-row-${rowIndex}`} className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
+        <div
+          key={`key-row-${rowIndex}`}
+          className="keyboard-row flex flex-nowrap justify-center gap-1.5 sm:gap-2"
+        >
           {row.map((key) => {
             if (key === 'ENTER') {
               return (
@@ -39,7 +42,7 @@ function Keyboard({ letterStates, onLetter, onEnter, onBackspace }: KeyboardProp
                   key={key}
                   type="button"
                   onClick={onEnter}
-                  className="key key--action"
+                  className="key key--action key--wide"
                 >
                   Enter
                 </button>
@@ -51,7 +54,7 @@ function Keyboard({ letterStates, onLetter, onEnter, onBackspace }: KeyboardProp
                   key={key}
                   type="button"
                   onClick={onBackspace}
-                  className="key key--action"
+                  className="key key--action key--wide"
                   aria-label="Backspace"
                 >
                   Back
@@ -65,7 +68,7 @@ function Keyboard({ letterStates, onLetter, onEnter, onBackspace }: KeyboardProp
                 type="button"
                 data-key={key}
                 onClick={handleLetterClick}
-                className={keyStyles[letterStates[key] ?? 'empty']}
+                className={`${keyStyles[letterStates[key] ?? 'empty']} key--letter`}
               >
                 {key}
               </button>
