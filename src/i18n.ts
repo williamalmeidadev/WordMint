@@ -44,7 +44,10 @@ type Strings = {
   stateLabel: (state: string) => string;
   hardModePosition: (position: number, letter: string) => string;
   hardModeInclude: (count: number, letter: string) => string;
-  shareHeader: (attempts: number | 'X' | '-') => string;
+  shareHeader: (attempts: number | 'X' | '-', maxLabel: string) => string;
+  attemptsRemaining: (remaining: number) => string;
+  attemptsUsed: (used: number) => string;
+  attemptsUnlimited: string;
 };
 
 export const STRINGS: Record<Language, Strings> = {
@@ -94,7 +97,11 @@ export const STRINGS: Record<Language, Strings> = {
     hardModePosition: (position, letter) => `Modo difícil: a posição ${position} deve ser ${letter}`,
     hardModeInclude: (count, letter) =>
       `Modo difícil: inclua pelo menos ${count} ${count === 1 ? 'letra' : 'letras'} '${letter}'`,
-    shareHeader: (attempts) => `WordMint Aleatório ${attempts}/6`
+    shareHeader: (attempts, maxLabel) => `WordMint Aleatório ${attempts}/${maxLabel}`,
+    attemptsRemaining: (remaining) =>
+      remaining === 1 ? '1 tentativa restante' : `${remaining} tentativas restantes`,
+    attemptsUsed: (used) => `${used} tentativas feitas`,
+    attemptsUnlimited: 'Tentativas ilimitadas'
   },
   en: {
     appName: 'WordMint',
@@ -136,7 +143,10 @@ export const STRINGS: Record<Language, Strings> = {
     hardModePosition: (position, letter) => `Hard mode: position ${position} must be ${letter}`,
     hardModeInclude: (count, letter) =>
       `Hard mode: include at least ${count} ${count === 1 ? `'${letter}'` : `'${letter}'s`}`,
-    shareHeader: (attempts) => `WordMint Random ${attempts}/6`
+    shareHeader: (attempts, maxLabel) => `WordMint Random ${attempts}/${maxLabel}`,
+    attemptsRemaining: (remaining) => (remaining === 1 ? '1 attempt left' : `${remaining} attempts left`),
+    attemptsUsed: (used) => `${used} attempts made`,
+    attemptsUnlimited: 'Unlimited attempts'
   }
 };
 

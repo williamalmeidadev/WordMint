@@ -5,6 +5,7 @@ import Keyboard from './components/Keyboard';
 import MessageBanner from './components/MessageBanner';
 import StatsPanel from './components/StatsPanel';
 import {
+  HARD_MODE_ATTEMPTS,
   MAX_ATTEMPTS,
   WORD_LENGTH,
   buildEmptyEvaluation,
@@ -58,14 +59,21 @@ export default function App() {
   } = state;
   const strings = getStrings(language);
 
+  const maxAttempts = hardMode ? HARD_MODE_ATTEMPTS : MAX_ATTEMPTS;
+
   const rows = useMemo(() => {
     const filledRows = evaluations.map((evaluation) => evaluation);
-    const activeRow = status === 'playing' && filledRows.length < MAX_ATTEMPTS ? buildActiveRow(currentGuess) : null;
-    const emptyRows = Array.from({ length: MAX_ATTEMPTS - filledRows.length - (activeRow ? 1 : 0) }, () =>
+    const activeRow = status === 'playing' && (hardMode ? filledRows.length < maxAttempts : true)
+      ? buildActiveRow(currentGuess)
+      : null;
+    if (!hardMode) {
+      return [...filledRows, ...(activeRow ? [activeRow] : [])];
+    }
+    const emptyRows = Array.from({ length: maxAttempts - filledRows.length - (activeRow ? 1 : 0) }, () =>
       buildEmptyEvaluation()
     );
     return [...filledRows, ...(activeRow ? [activeRow] : []), ...emptyRows];
-  }, [currentGuess, evaluations, status]);
+  }, [currentGuess, evaluations, hardMode, maxAttempts, status]);
 
   const keyboardState = useMemo(() => buildKeyboardState(evaluations), [evaluations]);
 
@@ -108,7 +116,8 @@ export default function App() {
       if (status === 'won') {
         nextStats.gamesWon += 1;
         if (evaluations.length > 0) {
-          nextStats.guessDistribution[evaluations.length - 1] += 1;
+          const bucketIndex = Math.min(evaluations.length, MAX_ATTEMPTS) - 1;
+          nextStats.guessDistribution[bucketIndex] += 1;
         }
         nextStats.currentStreak += 1;
         nextStats.maxStreak = Math.max(nextStats.maxStreak, nextStats.currentStreak);
@@ -154,7 +163,7 @@ export default function App() {
 
     const evaluation = evaluateGuess(currentGuess, solution);
     const isWin = isWinningGuess(currentGuess, solution);
-    const nextStatus = isWin ? 'won' : attemptIndex + 1 >= MAX_ATTEMPTS ? 'lost' : 'playing';
+    const nextStatus = isWin ? 'won' : hardMode && attemptIndex + 1 >= maxAttempts ? 'lost' : 'playing';
     const nextMessage = isWin
       ? strings.solvedIn(attemptIndex + 1)
       : nextStatus === 'lost'
@@ -168,7 +177,18 @@ export default function App() {
       status: nextStatus,
       message: nextMessage ?? undefined
     });
-  }, [attemptIndex, currentGuess, evaluations, hardMode, language, setMessage, solution, status, strings]);
+  }, [
+    attemptIndex,
+    currentGuess,
+    evaluations,
+    hardMode,
+    language,
+    maxAttempts,
+    setMessage,
+    solution,
+    status,
+    strings
+  ]);
 
   const handleLetter = useCallback(
     (letter: string) => {
@@ -189,12 +209,13 @@ export default function App() {
 
   const shareText = useMemo(() => {
     if (status === 'playing') return '';
+    const maxLabel = hardMode ? String(maxAttempts) : '∞';
     return buildShareText({
       status,
       evaluations,
-      header: strings.shareHeader
+      header: (attempts) => strings.shareHeader(attempts, maxLabel)
     });
-  }, [evaluations, status, strings]);
+  }, [evaluations, hardMode, maxAttempts, status, strings]);
 
   const handleShare = useCallback(async () => {
     try {
@@ -276,6 +297,11 @@ export default function App() {
                 {status === 'won' && strings.statusWon}
                 {status === 'lost' && strings.statusLost}
               </p>
+              <p className="text-xs uppercase tracking-[0.3em] text-fog/50">
+                {hardMode
+                  ? strings.attemptsRemaining(Math.max(maxAttempts - attemptIndex, 0))
+                  : strings.attemptsUsed(attemptIndex)}
+              </p>
             </div>
             <button
               type="button"
@@ -310,6 +336,7 @@ export default function App() {
           status={status}
           onShare={handleShare}
           shareAvailable={status !== 'playing'}
+          showPlusOnLast={!hardMode}
           strings={{
             statistics: strings.statistics,
             progressSnapshot: strings.progressSnapshot,

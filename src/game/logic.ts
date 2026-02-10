@@ -1,4 +1,4 @@
-import { MAX_ATTEMPTS, WORD_LENGTH } from './constants';
+import { HARD_MODE_ATTEMPTS, MAX_ATTEMPTS, WORD_LENGTH } from './constants';
 import type { GuessEvaluation, LetterState } from './types';
 import type { Language } from '../i18n';
 import { getWordList, getWordSet } from './words';
@@ -118,7 +118,12 @@ export const getHardModeViolation = (
 export const isWinningGuess = (guess: string, solution: string) =>
   normalizeWord(guess) === normalizeWord(solution);
 
-export const isGameOver = (attempt: number, status: 'playing' | 'won' | 'lost') => {
+export const isGameOver = (
+  attempt: number,
+  status: 'playing' | 'won' | 'lost',
+  hardMode: boolean
+) => {
   if (status !== 'playing') return true;
-  return attempt >= MAX_ATTEMPTS;
+  const maxAttempts = hardMode ? HARD_MODE_ATTEMPTS : MAX_ATTEMPTS;
+  return attempt >= maxAttempts;
 };
