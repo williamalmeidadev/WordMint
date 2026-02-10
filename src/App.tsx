@@ -229,9 +229,12 @@ export default function App() {
       handleBackspace();
       return;
     }
-      if (/^[a-zA-Z]$/.test(event.key)) {
-        event.preventDefault();
-        handleLetter(event.key.toUpperCase());
+      if (event.key.length === 1) {
+        const normalized = normalizeWord(event.key);
+        if (normalized.length === 1) {
+          event.preventDefault();
+          handleLetter(normalized);
+        }
       }
     };
 
