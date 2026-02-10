@@ -9,6 +9,7 @@ type StatsPanelProps = {
   status: GameStatus;
   onShare: () => void;
   shareAvailable: boolean;
+  showPlusOnLast: boolean;
   strings: {
     statistics: string;
     progressSnapshot: string;
@@ -23,7 +24,7 @@ type StatsPanelProps = {
   };
 };
 
-function StatsPanel({ stats, status, onShare, shareAvailable, strings }: StatsPanelProps) {
+function StatsPanel({ stats, status, onShare, shareAvailable, showPlusOnLast, strings }: StatsPanelProps) {
   const winRate = stats.gamesPlayed ? stats.gamesWon / stats.gamesPlayed : 0;
   const maxDistribution = Math.max(1, ...stats.guessDistribution);
 
@@ -67,9 +68,12 @@ function StatsPanel({ stats, status, onShare, shareAvailable, strings }: StatsPa
       <div className="grid gap-3">
         <p className="text-xs uppercase tracking-[0.35em] text-fog/50">{strings.guessDistribution}</p>
         <div className="grid gap-2">
-          {stats.guessDistribution.map((value, index) => (
+          {stats.guessDistribution.map((value, index) => {
+            const isLast = index === stats.guessDistribution.length - 1;
+            const label = showPlusOnLast && isLast ? `${index + 1}+` : `${index + 1}`;
+            return (
             <div key={`guess-${index}`} className="flex items-center gap-3 text-sm">
-              <span className="w-6 text-fog/60">{index + 1}</span>
+              <span className="w-6 text-fog/60">{label}</span>
               <div className="h-2 flex-1 rounded-full bg-ink/70">
                 <div
                   className="h-2 rounded-full bg-mint"
@@ -78,7 +82,7 @@ function StatsPanel({ stats, status, onShare, shareAvailable, strings }: StatsPa
               </div>
               <span className="w-6 text-right text-fog/60">{value}</span>
             </div>
-          ))}
+          )})}
         </div>
         <p className="text-xs text-fog/60">
           {status === 'playing' ? strings.finishRound : strings.resultRecorded}

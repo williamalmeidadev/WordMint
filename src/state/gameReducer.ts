@@ -1,4 +1,4 @@
-import { MAX_ATTEMPTS, WORD_LENGTH } from '../game/constants';
+import { HARD_MODE_ATTEMPTS, MAX_ATTEMPTS, WORD_LENGTH } from '../game/constants';
 import type { GameStatus, GuessEvaluation } from '../game/types';
 import type { Language } from '../i18n';
 
@@ -65,7 +65,7 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
     }
     case 'SUBMIT_GUESS': {
       if (state.status !== 'playing') return state;
-      if (state.attemptIndex >= MAX_ATTEMPTS) return state;
+      if (state.hardMode && state.attemptIndex >= HARD_MODE_ATTEMPTS) return state;
 
       const nextGuesses = [...state.guesses, action.guess];
       const nextEvaluations = [...state.evaluations, action.evaluation];
@@ -76,7 +76,9 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         evaluations: nextEvaluations,
         currentGuess: '',
         status: action.status,
-        attemptIndex: Math.min(state.attemptIndex + 1, MAX_ATTEMPTS),
+        attemptIndex: state.hardMode
+          ? Math.min(state.attemptIndex + 1, HARD_MODE_ATTEMPTS)
+          : state.attemptIndex + 1,
         message: action.message ?? null
       };
     }
