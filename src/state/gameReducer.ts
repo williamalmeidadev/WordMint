@@ -1,4 +1,4 @@
-import { HARD_MODE_ATTEMPTS, MAX_ATTEMPTS, WORD_LENGTH } from '../game/constants';
+import { HARD_MODE_ATTEMPTS, WORD_LENGTH } from '../game/constants';
 import type { GameStatus, GuessEvaluation } from '../game/types';
 import type { Language } from '../i18n';
 

@@ -240,16 +240,25 @@ export default function App() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const isEditableTarget =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        Boolean(target?.isContentEditable);
+
+      if (event.isComposing || isEditableTarget) return;
+
       if (event.key === 'Enter') {
         event.preventDefault();
         submitGuess();
         return;
       }
-    if (event.key === 'Backspace') {
-      event.preventDefault();
-      handleBackspace();
-      return;
-    }
+      if (event.key === 'Backspace') {
+        event.preventDefault();
+        handleBackspace();
+        return;
+      }
       if (event.key.length === 1) {
         const normalized = normalizeWord(event.key);
         if (normalized.length === 1) {
