@@ -33,15 +33,53 @@ export const createEmptyStats = (): GameStats => ({
   guessDistribution: Array.from({ length: MAX_ATTEMPTS }, () => 0)
 });
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const toSafeNonNegativeInt = (value: unknown, fallback = 0) => {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return fallback;
+  return Math.max(0, Math.trunc(value));
+};
+
+const sanitizeDistribution = (value: unknown) => {
+  if (!Array.isArray(value)) return createEmptyStats().guessDistribution;
+  const normalized = value
+    .slice(0, MAX_ATTEMPTS)
+    .map((item) => toSafeNonNegativeInt(item));
+  while (normalized.length < MAX_ATTEMPTS) normalized.push(0);
+  return normalized;
+};
+
+const sanitizeStats = (value: unknown): GameStats => {
+  if (!isRecord(value)) return createEmptyStats();
+  return {
+    gamesPlayed: toSafeNonNegativeInt(value.gamesPlayed),
+    gamesWon: toSafeNonNegativeInt(value.gamesWon),
+    currentStreak: toSafeNonNegativeInt(value.currentStreak),
+    maxStreak: toSafeNonNegativeInt(value.maxStreak),
+    guessDistribution: sanitizeDistribution(value.guessDistribution)
+  };
+};
+
+const sanitizeLanguage = (value: unknown): Language => (value === 'en' ? 'en' : 'pt');
+
+const sanitizeTheme = (value: unknown): 'dark' | 'light' => (value === 'light' ? 'light' : 'dark');
+
+const sanitizeSettings = (value: unknown): GameSettings => {
+  if (!isRecord(value)) return createDefaultSettings();
+  return {
+    colorBlindMode: Boolean(value.colorBlindMode),
+    hardMode: Boolean(value.hardMode),
+    theme: sanitizeTheme(value.theme),
+    language: sanitizeLanguage(value.language)
+  };
+};
+
 export const loadStats = (): GameStats => {
   try {
     const raw = localStorage.getItem(STATS_KEY);
     if (!raw) return createEmptyStats();
-    const parsed = JSON.parse(raw) as GameStats;
-    if (!parsed.guessDistribution || parsed.guessDistribution.length !== MAX_ATTEMPTS) {
-      return createEmptyStats();
-    }
-    return parsed;
+    return sanitizeStats(JSON.parse(raw));
   } catch {
     return createEmptyStats();
   }
@@ -55,12 +93,7 @@ export const loadSettings = (): GameSettings => {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
     if (!raw) return createDefaultSettings();
-    const parsed = JSON.parse(raw) as GameSettings;
-    if (typeof parsed.colorBlindMode !== 'boolean') return createDefaultSettings();
-    if (typeof parsed.hardMode !== 'boolean') return createDefaultSettings();
-    if (parsed.theme !== 'dark' && parsed.theme !== 'light') return createDefaultSettings();
-    if (parsed.language !== 'pt' && parsed.language !== 'en') return createDefaultSettings();
-    return parsed;
+    return sanitizeSettings(JSON.parse(raw));
   } catch {
     return createDefaultSettings();
   }

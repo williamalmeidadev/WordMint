@@ -39,6 +39,20 @@ const hydrateState = () => {
   );
 };
 
+const fallbackCopyText = (value: string) => {
+  const textarea = document.createElement('textarea');
+  textarea.value = value;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.top = '-9999px';
+  textarea.style.left = '-9999px';
+  document.body.appendChild(textarea);
+  textarea.select();
+  const copied = document.execCommand('copy');
+  document.body.removeChild(textarea);
+  return copied;
+};
+
 export default function App() {
   const [state, dispatch] = useReducer(gameReducer, undefined, hydrateState);
   const [stats, setStats] = useState(loadStats);
@@ -219,7 +233,11 @@ export default function App() {
 
   const handleShare = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(shareText);
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareText);
+      } else if (!fallbackCopyText(shareText)) {
+        throw new Error('Clipboard API unavailable');
+      }
       setMessage(strings.copiedToClipboard);
     } catch {
       setMessage(strings.clipboardUnavailable);
