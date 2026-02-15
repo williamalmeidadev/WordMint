@@ -21,6 +21,25 @@ export const getRandomWord = (language: Language) => {
   return list[Math.floor(Math.random() * list.length)];
 };
 
+export const getRandomWordExcluding = (language: Language, excluded: string[] = []) => {
+  const list = getWordList(language);
+  if (list.length === 0) return '';
+
+  const excludedSet = new Set(excluded.map((word) => normalizeWord(word)));
+  if (excludedSet.size === 0) return getRandomWord(language);
+  if (list.length <= excludedSet.size) return getRandomWord(language);
+
+  for (let i = 0; i < 20; i += 1) {
+    const candidate = list[Math.floor(Math.random() * list.length)];
+    if (!excludedSet.has(normalizeWord(candidate))) {
+      return candidate;
+    }
+  }
+
+  const fallback = list.find((word) => !excludedSet.has(normalizeWord(word)));
+  return fallback ?? getRandomWord(language);
+};
+
 export const evaluateGuess = (guess: string, solution: string): GuessEvaluation => {
   const cleanGuess = normalizeWord(guess).padEnd(WORD_LENGTH, ' ');
   const cleanSolution = normalizeWord(solution);

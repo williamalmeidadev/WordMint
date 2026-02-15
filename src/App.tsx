@@ -13,6 +13,7 @@ import {
   buildShareText,
   evaluateGuess,
   getRandomWord,
+  getRandomWordExcluding,
   getHardModeViolation,
   isValidWord,
   isWinningGuess,
@@ -218,8 +219,8 @@ export default function App() {
   }, []);
 
   const resetGame = useCallback(() => {
-    dispatch({ type: 'RESET_GAME', solution: getRandomWord(language) });
-  }, [language]);
+    dispatch({ type: 'RESET_GAME', solution: getRandomWordExcluding(language, [solution]) });
+  }, [language, solution]);
 
   const shareText = useMemo(() => {
     if (status === 'playing') return '';
@@ -249,11 +250,11 @@ export default function App() {
       if (nextLanguage === language) return;
       dispatch({
         type: 'RESET_GAME',
-        solution: getRandomWord(nextLanguage),
+        solution: getRandomWordExcluding(nextLanguage, [solution]),
         language: nextLanguage
       });
     },
-    [language]
+    [language, solution]
   );
 
   useEffect(() => {
@@ -269,7 +270,11 @@ export default function App() {
 
       if (event.key === 'Enter') {
         event.preventDefault();
-        submitGuess();
+        if (status === 'playing') {
+          submitGuess();
+        } else {
+          resetGame();
+        }
         return;
       }
       if (event.key === 'Backspace') {
@@ -288,7 +293,7 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleBackspace, handleLetter, submitGuess]);
+  }, [handleBackspace, handleLetter, resetGame, status, submitGuess]);
 
   return (
     <main className="app-shell min-h-screen text-fog">
@@ -351,7 +356,7 @@ export default function App() {
         <Keyboard
           letterStates={keyboardState}
           onLetter={handleLetter}
-          onEnter={submitGuess}
+          onEnter={status === 'playing' ? submitGuess : resetGame}
           onBackspace={handleBackspace}
           enterLabel={strings.enterKey}
           backspaceLabel={strings.backspaceKey}
