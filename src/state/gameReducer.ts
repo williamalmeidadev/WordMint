@@ -19,6 +19,7 @@ export type GameState = {
 export type GameAction =
   | { type: 'ADD_LETTER'; letter: string }
   | { type: 'REMOVE_LETTER' }
+  | { type: 'CLEAR_GUESS' }
   | { type: 'SUBMIT_GUESS'; guess: string; evaluation: GuessEvaluation; status: GameStatus; message?: string }
   | { type: 'SET_MESSAGE'; message: string | null }
   | { type: 'RESET_GAME'; solution: string; language?: Language }
@@ -61,6 +62,14 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
       return {
         ...state,
         currentGuess: state.currentGuess.slice(0, -1)
+      };
+    }
+    case 'CLEAR_GUESS': {
+      if (state.status !== 'playing') return state;
+      if (!state.currentGuess) return state;
+      return {
+        ...state,
+        currentGuess: ''
       };
     }
     case 'SUBMIT_GUESS': {

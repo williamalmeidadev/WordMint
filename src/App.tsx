@@ -21,7 +21,7 @@ import {
 } from './game';
 import { createInitialState, gameReducer } from './state/gameReducer';
 import type { GuessEvaluation } from './game/types';
-import { loadSettings, loadStats, saveSettings, saveStats } from './storage/storage';
+import { loadGameState, loadSettings, loadStats, saveGameState, saveSettings, saveStats } from './storage/storage';
 import { getStrings } from './i18n';
 
 const buildActiveRow = (currentGuess: string): GuessEvaluation => ({
@@ -30,6 +30,14 @@ const buildActiveRow = (currentGuess: string): GuessEvaluation => ({
 });
 
 const hydrateState = () => {
+  const restored = loadGameState();
+  if (restored) {
+    return {
+      ...restored,
+      message: null
+    };
+  }
+
   const settings = loadSettings();
   return createInitialState(
     getRandomWord(settings.language),
@@ -107,6 +115,32 @@ export default function App() {
   useEffect(() => {
     saveSettings({ colorBlindMode, hardMode, theme, language });
   }, [colorBlindMode, hardMode, theme, language]);
+
+  useEffect(() => {
+    saveGameState({
+      solution,
+      guesses,
+      evaluations,
+      currentGuess,
+      status,
+      attemptIndex,
+      colorBlindMode,
+      hardMode,
+      theme,
+      language
+    });
+  }, [
+    attemptIndex,
+    colorBlindMode,
+    currentGuess,
+    evaluations,
+    guesses,
+    hardMode,
+    language,
+    solution,
+    status,
+    theme
+  ]);
 
   useEffect(() => {
     if (status === 'playing') {
@@ -218,6 +252,10 @@ export default function App() {
     dispatch({ type: 'REMOVE_LETTER' });
   }, []);
 
+  const handleClearGuess = useCallback(() => {
+    dispatch({ type: 'CLEAR_GUESS' });
+  }, []);
+
   const resetGame = useCallback(() => {
     dispatch({ type: 'RESET_GAME', solution: getRandomWordExcluding(language, [solution]) });
   }, [language, solution]);
@@ -282,6 +320,11 @@ export default function App() {
         handleBackspace();
         return;
       }
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        handleClearGuess();
+        return;
+      }
       if (event.key.length === 1) {
         const normalized = normalizeWord(event.key);
         if (normalized.length === 1) {
@@ -293,7 +336,7 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleBackspace, handleLetter, resetGame, status, submitGuess]);
+  }, [handleBackspace, handleClearGuess, handleLetter, resetGame, status, submitGuess]);
 
   return (
     <main className="app-shell min-h-screen text-fog">
