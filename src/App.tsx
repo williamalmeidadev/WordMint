@@ -340,7 +340,7 @@ export default function App() {
 
   return (
     <main className="app-shell min-h-screen text-fog">
-      <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-8 px-4 py-8 sm:gap-10 sm:px-6 sm:py-10">
+      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:gap-8 sm:px-6 sm:py-8 lg:px-8">
         <Header
           colorBlindMode={colorBlindMode}
           onToggleColorBlind={() => dispatch({ type: 'TOGGLE_COLOR_BLIND' })}
@@ -363,38 +363,74 @@ export default function App() {
           }}
         />
 
-        <section className="panel grid gap-6 rounded-2xl border border-fog/10 bg-slate/60 px-4 py-5 sm:rounded-3xl sm:px-6 sm:py-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.35em] text-fog/50">{strings.randomMode}</p>
-              <p className="text-base font-semibold sm:text-lg">
-                {status === 'playing' && strings.statusPlaying}
-                {status === 'won' && strings.statusWon}
-                {status === 'lost' && strings.statusLost}
-              </p>
-              <p className="text-xs uppercase tracking-[0.3em] text-fog/50">
-                {hardMode
-                  ? strings.attemptsRemaining(Math.max(maxAttempts - attemptIndex, 0))
-                  : strings.attemptsUsed(attemptIndex)}
-              </p>
+        <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_21.5rem] lg:gap-6">
+          <section className="panel grid gap-5 rounded-2xl border border-fog/10 bg-slate/60 px-4 py-5 sm:rounded-3xl sm:px-6 sm:py-6">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.35em] text-fog/50">{strings.randomMode}</p>
+                  <p className="text-base font-semibold sm:text-lg">
+                    {status === 'playing' && strings.statusPlaying}
+                    {status === 'won' && strings.statusWon}
+                    {status === 'lost' && strings.statusLost}
+                  </p>
+                  <p className="text-xs uppercase tracking-[0.3em] text-fog/50">
+                    {hardMode
+                      ? strings.attemptsRemaining(Math.max(maxAttempts - attemptIndex, 0))
+                      : strings.attemptsUsed(attemptIndex)}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={resetGame}
+                  className="control-pill w-full rounded-full border border-fog/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-fog/70 transition hover:border-mint hover:text-mint sm:w-auto"
+                >
+                  {strings.newWord}
+                </button>
+              </div>
+              <div
+                className="h-2 overflow-hidden rounded-full bg-ink/70"
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={maxAttempts}
+                aria-valuenow={Math.min(attemptIndex, maxAttempts)}
+              >
+                <div
+                  className="h-full rounded-full bg-mint transition-[width] duration-300"
+                  style={{ width: `${Math.min((attemptIndex / maxAttempts) * 100, 100)}%` }}
+                />
+              </div>
             </div>
-            <button
-              type="button"
-              onClick={resetGame}
-              className="control-pill w-full rounded-full border border-fog/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-fog/70 transition hover:border-mint hover:text-mint sm:w-auto"
-            >
-              {strings.newWord}
-            </button>
-          </div>
 
-          <MessageBanner message={message} />
-          <GameBoard
-            rows={rows}
-            activeRowIndex={status === 'playing' ? evaluations.length : -1}
-            tileAria={(row, col, state) => strings.tileAria(row, col, strings.stateLabel(state))}
-            boardLabel={strings.guessBoard}
+            <MessageBanner message={message} />
+            <GameBoard
+              rows={rows}
+              activeRowIndex={status === 'playing' ? evaluations.length : -1}
+              tileAria={(row, col, state) => strings.tileAria(row, col, strings.stateLabel(state))}
+              boardLabel={strings.guessBoard}
+            />
+          </section>
+
+          <StatsPanel
+            stats={stats}
+            status={status}
+            onShare={handleShare}
+            shareAvailable={status !== 'playing'}
+            showPlusOnLast={!hardMode}
+            strings={{
+              statistics: strings.statistics,
+              progressSnapshot: strings.progressSnapshot,
+              shareResult: strings.shareResult,
+              games: strings.games,
+              winRate: strings.winRate,
+              currentStreak: strings.currentStreak,
+              maxStreak: strings.maxStreak,
+              guessDistribution: strings.guessDistribution,
+              finishRound: strings.finishRound,
+              resultRecorded: strings.resultRecorded
+            }}
           />
-        </section>
+        </div>
 
         <Keyboard
           letterStates={keyboardState}
@@ -404,26 +440,6 @@ export default function App() {
           enterLabel={strings.enterKey}
           backspaceLabel={strings.backspaceKey}
           keyboardLabel={strings.onScreenKeyboard}
-        />
-
-        <StatsPanel
-          stats={stats}
-          status={status}
-          onShare={handleShare}
-          shareAvailable={status !== 'playing'}
-          showPlusOnLast={!hardMode}
-          strings={{
-            statistics: strings.statistics,
-            progressSnapshot: strings.progressSnapshot,
-            shareResult: strings.shareResult,
-            games: strings.games,
-            winRate: strings.winRate,
-            currentStreak: strings.currentStreak,
-            maxStreak: strings.maxStreak,
-            guessDistribution: strings.guessDistribution,
-            finishRound: strings.finishRound,
-            resultRecorded: strings.resultRecorded
-          }}
         />
       </div>
     </main>

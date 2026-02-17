@@ -32,7 +32,9 @@ function Keyboard({ letterStates, onLetter, onEnter, onBackspace, enterLabel, ba
   };
 
   return (
-    <section aria-label={keyboardLabel} className="flex flex-col gap-1.5 sm:gap-2">
+    <section aria-label={keyboardLabel} className="panel rounded-2xl border border-fog/10 bg-slate/60 px-3 py-4 sm:rounded-3xl sm:px-4 sm:py-5">
+      <div className="mb-3 text-center text-xs uppercase tracking-[0.35em] text-fog/50">{keyboardLabel}</div>
+      <div className="flex flex-col gap-1.5 sm:gap-2">
       {rows.map((row, rowIndex) => (
         <div
           key={`key-row-${rowIndex}`}
@@ -79,6 +81,7 @@ function Keyboard({ letterStates, onLetter, onEnter, onBackspace, enterLabel, ba
           })}
         </div>
       ))}
+      </div>
     </section>
   );
 }

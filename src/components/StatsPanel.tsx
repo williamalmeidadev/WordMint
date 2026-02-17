@@ -29,7 +29,7 @@ function StatsPanel({ stats, status, onShare, shareAvailable, showPlusOnLast, st
   const maxDistribution = Math.max(1, ...stats.guessDistribution);
 
   return (
-    <section className="panel grid gap-4 rounded-2xl border border-fog/10 bg-slate/60 px-4 py-5 sm:rounded-3xl sm:px-6 sm:py-6">
+    <section className="panel grid gap-4 rounded-2xl border border-fog/10 bg-slate/60 px-4 py-5 sm:rounded-3xl sm:px-6 sm:py-6 lg:sticky lg:top-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div>
           <p className="text-xs uppercase tracking-[0.35em] text-fog/50">{strings.statistics}</p>
@@ -39,27 +39,27 @@ function StatsPanel({ stats, status, onShare, shareAvailable, showPlusOnLast, st
           <button
             type="button"
             onClick={onShare}
-            className="control-pill w-full rounded-full bg-mint px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-ink sm:w-auto"
+            className="control-pill w-full rounded-full border border-mint bg-mint px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-ink transition hover:brightness-95 sm:w-auto"
           >
             {strings.shareResult}
           </button>
         ) : null}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border border-fog/10 bg-ink/60 px-4 py-4">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="rounded-2xl border border-fog/10 bg-ink/60 px-4 py-3">
           <p className="text-xs uppercase tracking-[0.3em] text-fog/60">{strings.games}</p>
           <p className="text-2xl font-semibold">{stats.gamesPlayed}</p>
         </div>
-        <div className="rounded-2xl border border-fog/10 bg-ink/60 px-4 py-4">
+        <div className="rounded-2xl border border-fog/10 bg-ink/60 px-4 py-3">
           <p className="text-xs uppercase tracking-[0.3em] text-fog/60">{strings.winRate}</p>
           <p className="text-2xl font-semibold">{formatPercentage(winRate)}</p>
         </div>
-        <div className="rounded-2xl border border-fog/10 bg-ink/60 px-4 py-4">
+        <div className="rounded-2xl border border-fog/10 bg-ink/60 px-4 py-3">
           <p className="text-xs uppercase tracking-[0.3em] text-fog/60">{strings.currentStreak}</p>
           <p className="text-2xl font-semibold">{stats.currentStreak}</p>
         </div>
-        <div className="rounded-2xl border border-fog/10 bg-ink/60 px-4 py-4">
+        <div className="rounded-2xl border border-fog/10 bg-ink/60 px-4 py-3">
           <p className="text-xs uppercase tracking-[0.3em] text-fog/60">{strings.maxStreak}</p>
           <p className="text-2xl font-semibold">{stats.maxStreak}</p>
         </div>
@@ -73,10 +73,10 @@ function StatsPanel({ stats, status, onShare, shareAvailable, showPlusOnLast, st
             const label = showPlusOnLast && isLast ? `${index + 1}+` : `${index + 1}`;
             return (
             <div key={`guess-${index}`} className="flex items-center gap-3 text-sm">
-              <span className="w-6 text-fog/60">{label}</span>
-              <div className="h-2 flex-1 rounded-full bg-ink/70">
+              <span className="w-6 rounded-md bg-ink/60 px-1 py-0.5 text-center text-fog/70">{label}</span>
+              <div className="h-2.5 flex-1 rounded-full bg-ink/70">
                 <div
-                  className="h-2 rounded-full bg-mint"
+                  className="h-2.5 rounded-full bg-mint transition-[width] duration-300"
                   style={{ width: `${Math.round((value / maxDistribution) * 100)}%` }}
                 />
               </div>
